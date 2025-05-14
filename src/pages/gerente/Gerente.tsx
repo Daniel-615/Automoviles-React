@@ -2,7 +2,7 @@ import React, { useEffect, useState, ChangeEvent } from 'react';
 import '../../components/css/Gerente.css';
 import axios from 'axios';
 
-const PRIMARY_API = 'https://microservicio_ventas.serveo.net/ventas';
+const PRIMARY_API = 'https://autos-flask-umg-backend-ajbqcxhaaudjbdf0.mexicocentral-01.azurewebsites.net/ventas';
 const FALLBACK_API = 'http://localhost:5000/ventas';
 
 interface Gerente {

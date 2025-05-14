@@ -2,7 +2,7 @@ import React, { useEffect, useState, ChangeEvent } from 'react';
 import axios from 'axios';
 import '../../components/css/vendedor_tienda.css';
 
-const PRIMARY_API = 'https://microservicio_ventas.serveo.net/ventas/vendedor/tienda';
+const PRIMARY_API = 'https://autos-flask-umg-backend-ajbqcxhaaudjbdf0.mexicocentral-01.azurewebsites.net/ventas/vendedor/tienda';
 const FALLBACK_API = 'http://127.0.0.1:5000/ventas/vendedor/tienda';
 
 const axiosWithFallback = async (method: 'get' | 'post' | 'put', path: string, data?: any) => {
