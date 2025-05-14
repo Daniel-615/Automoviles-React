@@ -1,0 +1,128 @@
+.segmento-container {
+  max-width: 900px;
+  margin: 4rem auto;
+  padding: 2.5rem 2rem;
+  background: white;
+  margin-right: -5rem;
+  margin-left:5rem;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+  box-sizing: border-box;
+}
+
+.segmento-container h2 {
+  text-align: center;
+  margin-bottom: 2rem;
+  color: #1565c0;
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+/* Formularios */
+.form-busqueda,
+.formulario {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.form-busqueda input,
+.formulario input {
+  padding: 0.6rem 1rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  min-width: 250px;
+  flex: 1 1 250px;
+  background-color: white;
+  color: #333;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+input:focus {
+  outline: none;
+  border-color: #1565c0;
+  box-shadow: 0 0 0 3px rgba(21, 101, 192, 0.2);
+}
+
+button {
+  padding: 0.6rem 1.5rem;
+  font-size: 1rem;
+  background-color: #212121;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.2s ease;
+}
+
+button:hover {
+  background-color: #0d47a1;
+}
+
+.btn-cancelar {
+  background-color: #9e9e9e;
+}
+.btn-cancelar:hover {
+  background-color: #757575;
+}
+
+.btn-ver {
+  background-color: #388e3c;
+}
+.btn-ver:hover {
+  background-color: #2e7d32;
+}
+
+/* Botón único centrado */
+.formulario button:last-child {
+  width: 100%;
+  max-width: 300px;
+}
+
+/* Lista */
+.lista-segmentos {
+  list-style: none;
+  padding: 0;
+  margin-top: 2rem;
+}
+
+.lista-segmentos li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #e0e0e0;
+  padding: 1rem 0;
+  font-size: 1rem;
+  color: #333;
+}
+
+.lista-segmentos button {
+  margin-left: 0.5rem;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .form-busqueda,
+  .formulario {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .formulario input,
+  .formulario button,
+  .form-busqueda input,
+  .form-busqueda button {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .lista-segmentos li {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+}

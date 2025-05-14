@@ -1,4 +1,4 @@
-import PowerBIGrafico from "../components/Tiendas"
+import PowerBIGrafico from "../../components/tiendaBi/Tiendas"
 
 function Tiendas() {
   return (

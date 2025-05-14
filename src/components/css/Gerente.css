@@ -1,0 +1,98 @@
+.ciudad-container {
+    max-width: 900px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+  }
+  
+  .ciudad-container h2 {
+    text-align: center;
+    margin-bottom: 2rem;
+    color: #1565c0;
+    font-size: 1.8rem;
+    font-weight: bold;
+  }
+  
+  /* Formularios */
+  .form-busqueda,
+  .formulario {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+  }
+  
+  /* Inputs */
+  input {
+    padding: 0.6rem 1rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 1rem;
+    background-color: white;
+    color: #333;
+    min-width: 220px;
+    transition: border-color 0.2s ease;
+  }
+  
+  input:focus {
+    outline: none;
+    border-color: #1565c0;
+    box-shadow: 0 0 0 2px rgba(21, 101, 192, 0.2);
+  }
+  
+  /* Botones */
+  button {
+    padding: 0.6rem 1.2rem;
+    background-color: #1565c0;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.2s ease;
+  }
+  
+  button:hover {
+    background-color: #0d47a1;
+  }
+  
+  .btn-cancelar {
+    background-color: #9e9e9e;
+  }
+  
+  .btn-cancelar:hover {
+    background-color: #757575;
+  }
+  
+  .btn-ver {
+    background-color: #388e3c;
+  }
+  
+  .btn-ver:hover {
+    background-color: #2e7d32;
+  }
+  
+  /* Lista */
+  .lista-ciudades {
+    list-style: none;
+    padding: 0;
+    margin-top: 2rem;
+  }
+  
+  .lista-ciudades li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #e0e0e0;
+    padding: 1rem 0;
+    font-size: 1rem;
+    color: #333;
+  }
+  
+  .lista-ciudades button {
+    margin-left: 0.5rem;
+  }
+  
