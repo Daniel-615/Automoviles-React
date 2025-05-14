@@ -1,6 +1,6 @@
 import React, { useEffect, useState, ChangeEvent } from 'react';
 import axios from 'axios';
-import '../../components/css/Segmento.css';
+import '../../components/css/segmento.css';
 
 const PRIMARY_URL = 'https://autos-flask-umg-backend-ajbqcxhaaudjbdf0.mexicocentral-01.azurewebsites.net/ventas';
 const FALLBACK_URL = 'http://127.0.0.1:5000/ventas';
