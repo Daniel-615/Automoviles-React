@@ -1,6 +1,6 @@
 import React, { useEffect, useState, ChangeEvent } from 'react';
 import axios from 'axios';
-import '../../components/css/cliente.css'; // Asegúrate que el archivo esté en la ruta correcta
+import '../../components/css/Cliente.css'; // Asegúrate que el archivo esté en la ruta correcta
 
 const PRIMARY_API = 'https://autos-flask-umg-backend-ajbqcxhaaudjbdf0.mexicocentral-01.azurewebsites.net/ventas';
 const FALLBACK_API = 'http://localhost:5000/ventas';
