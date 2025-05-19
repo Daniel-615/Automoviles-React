@@ -1,0 +1,190 @@
+/* CONTENEDOR PRINCIPAL */
+.vendedor-container {
+  max-width: 960px;
+  margin: 3rem auto;
+  padding: 2.5rem 2rem;
+  background-color: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+  box-sizing: border-box;
+}
+
+/* TÍTULO */
+.vendedor-container h2 {
+  font-size: 2rem;
+  color: #1565c0;
+  font-weight: 700;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+/* FORMULARIO DE BÚSQUEDA */
+.form-busqueda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.form-busqueda input {
+  flex: 1 1 250px;
+  padding: 0.6rem 1rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+.form-busqueda button {
+  background-color: #2e2e2e;
+  color: white;
+  border: none;
+  padding: 0.6rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.form-busqueda button:hover {
+  background-color: #000;
+}
+
+/* FORMULARIO DE CREACIÓN / EDICIÓN */
+.formulario {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.formulario input {
+  flex: 1 1 220px;
+  padding: 0.6rem 1rem;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+.formulario button {
+  flex: 1 1 100%;
+  max-width: 300px;
+  background-color: #2e2e2e;
+  color: white;
+  border: none;
+  padding: 0.7rem 1rem;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.formulario button:hover {
+  background-color: #000;
+}
+
+.btn-cancelar {
+  background-color: #b71c1c !important;
+  margin-top: 0.5rem;
+}
+
+.btn-cancelar:hover {
+  background-color: #880e4f !important;
+}
+
+/* BOTÓN VER LISTA */
+.mostrar-vendedores {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.mostrar-vendedores button {
+  background-color: #2e2e2e;
+  color: white;
+  font-weight: 600;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.mostrar-vendedores button:hover {
+  background-color: #000;
+}
+
+/* LISTA DE VENDEDORES */
+.lista-vendedores {
+  list-style: none;
+  padding: 0;
+  margin-top: 2rem;
+}
+
+.lista-vendedores li {
+  background-color: #f1f1f1;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.lista-vendedores strong {
+  font-weight: 600;
+  color: #1a237e;
+}
+
+.lista-vendedores button {
+  margin-left: 1rem;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  background-color: #2e2e2e;
+  color: white;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+}
+
+.lista-vendedores button:hover {
+  background-color: #000;
+}
+
+.lista-vendedores .btn-ver {
+  background-color: #b71c1c;
+}
+
+.lista-vendedores .btn-ver:hover {
+  background-color: #880e4f;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .formulario,
+  .form-busqueda {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .formulario input,
+  .formulario button,
+  .form-busqueda input,
+  .form-busqueda button {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .mostrar-vendedores button {
+    width: 100%;
+  }
+
+  .lista-vendedores li {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.8rem;
+  }
+}

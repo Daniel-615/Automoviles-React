@@ -1,23 +1,27 @@
-/* NAVBAR completo */
+/* BARRA SUPERIOR */
 .navbar {
   width: 100%;
   background-color: #1565c0;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   padding: 1rem 0;
+  position: sticky;
+  top: 0;
+  z-index: 999;
 }
 
-/* Contenedor central del contenido */
+/* CONTENIDO CENTRADO Y RESPONSIVE */
 .navbar-content {
-  max-width: 940px;
+  width: 100%;
+  max-width: 1300px;
   margin: 0 auto;
-  padding: 0 2rem;
+  padding: 0 1.5rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
 }
 
-/* Logo */
+/* LOGO */
 .logo {
   font-size: 1.8rem;
   font-weight: bold;
@@ -25,7 +29,19 @@
   white-space: nowrap;
 }
 
-/* NAVIGATION LINKS */
+/* BOTÓN HAMBURGUESA */
+.navbar-toggle {
+  display: none;
+  background-color: #212121;
+  color: white;
+  border: none;
+  font-size: 1.6rem;
+  padding: 0.3rem 0.7rem;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* ENLACES PRINCIPALES */
 .nav-links {
   display: flex;
   gap: 1.2rem;
@@ -37,7 +53,6 @@
 
 .nav-links li {
   position: relative;
-  list-style: none;
 }
 
 .nav-links a,
@@ -55,7 +70,7 @@
   color: #ffeb3b;
 }
 
-/* DROPDOWN MENÚ */
+/* SUBMENÚS */
 .dropdown-menu {
   display: none;
   position: absolute;
@@ -75,23 +90,10 @@
 
 .dropdown-menu li {
   padding: 0.3rem 0;
-  list-style: none; /* Elimina los puntos */
 }
 
-.dropdown-menu .dropdown {
-  position: relative;
-}
-
-.dropdown-menu .dropdown-menu {
-  top: 0;
-  left: 100%;
-  margin-left: 0.2rem;
-}
-
-/* DROPDOWN LINKS */
 .dropdown-menu a {
   display: block;
-  padding: 0.4rem 0.2rem;
   color: white;
   text-decoration: none;
   font-weight: 500;
@@ -104,25 +106,52 @@
 
 /* RESPONSIVE */
 @media (max-width: 768px) {
-  .navbar-content {
-    flex-direction: column;
-    align-items: flex-start;
+  .navbar-toggle {
+    display: block;
+    margin-left: auto;
   }
 
   .nav-links {
+    display: none;
     flex-direction: column;
-    gap: 0.8rem;
+    width: 100%;
+    gap: 0.6rem;
     margin-top: 1rem;
+  }
+
+  .nav-links.abierto {
+    display: flex;
+  }
+
+  .nav-links li {
+    width: 100%;
+  }
+
+  .nav-links a,
+  .dropdown-toggle {
+    display: block;
+    width: 100%;
+    padding: 0.8rem 1rem;
   }
 
   .dropdown-menu {
     position: static;
+    background-color: #0d47a1;
     box-shadow: none;
     border-radius: 0;
-    padding: 0.5rem 0;
+    padding-left: 1rem;
+    margin-top: 0.3rem;
+  }
+
+  .dropdown-menu li {
+    padding-left: 0.5rem;
   }
 
   .dropdown:hover > .dropdown-menu {
+    display: none; /* Desactiva hover */
+  }
+
+  .dropdown.activo > .dropdown-menu {
     display: block;
   }
 }

@@ -1,0 +1,92 @@
+/* Contenedor principal */
+.vendedores-page {
+  max-width: 960px;
+  margin: 3rem auto;
+  padding: 2rem;
+  background-color: #fff;
+  border-radius: 16px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+  box-sizing: border-box;
+}
+
+/* Encabezado */
+.vendedores-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  border-bottom: 1px solid #dee2e6;
+  padding-bottom: 1rem;
+  margin-bottom: 2rem;
+}
+
+.vendedores-header h2 {
+  font-size: 1.75rem;
+  color: #1565c0;
+  margin: 0;
+  font-weight: 700;
+  flex: 1;
+}
+
+/* Botón volver */
+.volver-btn {
+  background-color: #212529;
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  white-space: nowrap;
+}
+
+.volver-btn:hover {
+  background-color: #000;
+}
+
+/* Lista de tarjetas */
+.vendedores-lista {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.5rem;
+}
+
+/* Tarjeta individual */
+.vendedor-card {
+  border: 1px solid #dee2e6;
+  padding: 1.2rem;
+  border-radius: 12px;
+  background-color: #f8f9fa;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.vendedor-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.vendedor-card p {
+  margin: 0.4rem 0;
+  font-size: 0.95rem;
+  color: #333;
+}
+
+.vendedor-card strong {
+  color: #0d6efd;
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+  .vendedores-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .volver-btn {
+    width: 100%;
+    margin-top: 1rem;
+  }
+}

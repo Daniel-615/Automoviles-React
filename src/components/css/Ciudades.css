@@ -1,7 +1,6 @@
 .ciudad-container {
   max-width: 940px;
-  margin: 2rem auto;
-  margin-right: -4rem;
+  margin: 3rem auto;
   padding: 2.5rem 2rem;
   background: white;
   border-radius: 12px;
@@ -10,6 +9,7 @@
   overflow-x: hidden;
 }
 
+/* TÍTULO */
 .ciudad-container h2 {
   text-align: center;
   margin-bottom: 2rem;
@@ -18,6 +18,7 @@
   font-weight: 700;
 }
 
+/* FORMULARIOS */
 .form-busqueda,
 .formulario {
   display: flex;
@@ -28,8 +29,11 @@
   margin-bottom: 1.5rem;
 }
 
+/* INPUTS Y BOTONES */
 .formulario input,
-.formulario button {
+.formulario button,
+.form-busqueda input,
+.form-busqueda button {
   flex: 1 1 220px;
   max-width: 300px;
   min-width: 180px;
@@ -37,24 +41,24 @@
   font-size: 1rem;
 }
 
-.formulario input {
+/* INPUT GENERAL */
+input {
   border: 1px solid #ccc;
   border-radius: 8px;
   background-color: white;
   color: #333;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
-.ciudad-container {
-  margin-top: -6rem; /* suficiente para mostrar el navbar completo */
-}
+
 input:focus {
   outline: none;
   border-color: #1565c0;
   box-shadow: 0 0 0 3px rgba(21, 101, 192, 0.2);
 }
 
+/* BOTONES */
 button {
-  background-color: #1565c0;
+  background-color: #212121;
   color: white;
   border: none;
   border-radius: 8px;
@@ -71,7 +75,6 @@ button:hover {
 .btn-cancelar {
   background-color: #9e9e9e;
 }
-
 .btn-cancelar:hover {
   background-color: #757575;
 }
@@ -79,11 +82,11 @@ button:hover {
 .btn-ver {
   background-color: #388e3c;
 }
-
 .btn-ver:hover {
   background-color: #2e7d32;
 }
 
+/* LISTADO */
 .lista-ciudades {
   list-style: none;
   padding: 0;
@@ -106,13 +109,16 @@ button:hover {
 
 /* RESPONSIVE */
 @media (max-width: 600px) {
-  .formulario {
+  .formulario,
+  .form-busqueda {
     flex-direction: column;
     align-items: stretch;
   }
 
   .formulario input,
-  .formulario button {
+  .formulario button,
+  .form-busqueda input,
+  .form-busqueda button {
     width: 100%;
     max-width: 100%;
   }

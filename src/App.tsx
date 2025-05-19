@@ -11,6 +11,7 @@ import Tienda from './pages/tienda/Tienda';
 import Vendedor from './pages/vendedor/Vendedor';
 import VendedorTienda from './pages/vendedor_tienda/vendedor_tienda';
 
+import ListaVendedores from './pages/vendedor/listaVendedores';
 import Carousel from 'react-multi-carousel';
 import 'react-multi-carousel/lib/styles.css';
 import './App.css';
@@ -79,6 +80,8 @@ function App() {
           <Route path="/tiendas" element={<Tienda />} />
           <Route path="/vendedor" element={<Vendedor />} />
           <Route path="/vendedor_tienda" element={<VendedorTienda />} />
+                    
+          <Route path="/vendedores" element={<ListaVendedores />} />
         </Routes>
       </main>
     </div>
