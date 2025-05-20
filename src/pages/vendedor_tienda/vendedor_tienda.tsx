@@ -175,6 +175,30 @@ const VendedorTienda: React.FC = () => {
           <button onClick={crearRegistro}>Crear</button>
         )}
       </div>
+
+      <div className="tabla-registros">
+        <h3>Registros existentes</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Vendedor</th>
+              <th>Tienda</th>
+              <th>Fecha de Renuncia</th>
+            </tr>
+          </thead>
+          <tbody>
+            {registros.map((r, i) => (
+              <tr key={r.id || i}>
+                <td>{r.id}</td>
+                <td>{r.vendedor_key}</td>
+                <td>{r.tienda_key}</td>
+                <td>{r.fecha_renuncia || '-'}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };
