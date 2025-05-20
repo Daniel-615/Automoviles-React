@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Vendedor } from './Vendedor';
 import { useNavigate } from 'react-router-dom';
-import '../../components/css/ListaVendedores.css'
+import '../../components/css/ListaVendedores.css';
 
 const PRIMARY_API = 'https://autos-flask-umg-backend-ajbqcxhaaudjbdf0.mexicocentral-01.azurewebsites.net/ventas';
 const FALLBACK_API = 'http://127.0.0.1:5000/ventas';
@@ -26,6 +26,10 @@ const ListaVendedores: React.FC = () => {
       .catch(err => console.error('Error al obtener vendedores:', err));
   }, []);
 
+  const editarVendedor = (id: string) => {
+    navigate(`/vendedor/${id}`);
+  };
+
   return (
     <div className="vendedores-page">
       <div className="vendedores-header">
@@ -35,21 +39,20 @@ const ListaVendedores: React.FC = () => {
         </button>
       </div>
       {vendedores.length === 0 ? (
-    <p style={{ color: '#666' }}>No hay vendedores registrados.</p>
+        <p style={{ color: '#666' }}>No hay vendedores registrados.</p>
       ) : (
-      <ul className="vendedores-lista">
-        {vendedores.map(v => (
-          <li key={v.vendedor_key} className="vendedor-card">
-            <p><strong>Nombre:</strong> {v.nombre}</p>
-            <p><strong>ID:</strong> {v.vendedor_id}</p>
-            <p><strong>Edad:</strong> {v.edad}</p>
-            <p><strong>Salario:</strong> Q{v.salario}</p>
-            <p><strong>Activo:</strong> {v.activo ? 'Sí' : 'No'}</p>
-          </li>
-        ))}
-      </ul>
-    )}
-
+        <ul className="vendedores-lista">
+          {vendedores.map(v => (
+            <li key={v.vendedor_key} className="vendedor-card" onClick={() => editarVendedor(v.vendedor_key || '')} style={{ cursor: 'pointer' }}>
+              <p><strong>Nombre:</strong> {v.nombre}</p>
+              <p><strong>ID:</strong> {v.vendedor_id}</p>
+              <p><strong>Edad:</strong> {v.edad}</p>
+              <p><strong>Salario:</strong> Q{v.salario}</p>
+              <p><strong>Activo:</strong> {v.activo ? 'Sí' : 'No'}</p>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 };

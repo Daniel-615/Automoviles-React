@@ -1,4 +1,3 @@
-// ============================ ClienteSegmento.tsx ============================
 import React, { useEffect, useState, ChangeEvent } from 'react';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -13,10 +12,17 @@ interface ClienteSegmento {
   segmento_key: string;
 }
 
+interface Opcion {
+  key: string;
+  nombre: string;
+}
+
 const ClienteSegmento: React.FC = () => {
   const [nuevaRelacion, setNuevaRelacion] = useState<Omit<ClienteSegmento, 'cliente_segmento_key'>>({
     cliente_key: '', segmento_key: ''
   });
+  const [clientes, setClientes] = useState<Opcion[]>([]);
+  const [segmentos, setSegmentos] = useState<Opcion[]>([]);
   const [editando, setEditando] = useState<ClienteSegmento | null>(null);
   const [busquedaId, setBusquedaId] = useState('');
   const { id } = useParams();
@@ -30,7 +36,34 @@ const ClienteSegmento: React.FC = () => {
     }
   };
 
+  const obtenerClientes = () => {
+    apiRequest('get', '/get/cliente')
+      .then(res => {
+        const data = res.data.clientes || res.data;
+        setClientes(data.map((c: any) => ({
+          key: c.cliente_key,
+          nombre: `${c.nombre} ${c.apellido}`
+        })));
+      })
+      .catch(console.error);
+  };
+
+  const obtenerSegmentos = () => {
+    apiRequest('get', '/get/segmento')
+      .then(res => {
+        const data = res.data.segmentos || res.data;
+        setSegmentos(data.map((s: any) => ({
+          key: s.segmento_key,
+          nombre: s.nombre
+        })));
+      })
+      .catch(console.error);
+  };
+
   useEffect(() => {
+    obtenerClientes();
+    obtenerSegmentos();
+
     if (id) {
       apiRequest('get', `/get/cliente_segmento/${id}`)
         .then(res => {
@@ -45,7 +78,7 @@ const ClienteSegmento: React.FC = () => {
     }
   }, [id]);
 
-  const manejarCambio = (e: ChangeEvent<HTMLInputElement>) => {
+  const manejarCambio = (e: ChangeEvent<HTMLSelectElement>) => {
     const { name, value } = e.target;
     setNuevaRelacion(prev => ({ ...prev, [name]: value }));
   };
@@ -54,9 +87,7 @@ const ClienteSegmento: React.FC = () => {
     if (!nuevaRelacion.cliente_key || !nuevaRelacion.segmento_key) return;
 
     apiRequest('post', '/post/cliente_segmento', nuevaRelacion)
-      .then(() => {
-        setNuevaRelacion({ cliente_key: '', segmento_key: '' });
-      })
+      .then(() => setNuevaRelacion({ cliente_key: '', segmento_key: '' }))
       .catch(console.error);
   };
 
@@ -104,21 +135,29 @@ const ClienteSegmento: React.FC = () => {
       </div>
 
       <div className="formulario">
-        <input
-          type="text"
+        <select
           name="cliente_key"
-          placeholder="UUID Cliente"
           value={nuevaRelacion.cliente_key}
           onChange={manejarCambio}
           disabled={!!editando}
-        />
-        <input
-          type="text"
+        >
+          <option value="">Selecciona un cliente</option>
+          {clientes.map(c => (
+            <option key={c.key} value={c.key}>{c.nombre}</option>
+          ))}
+        </select>
+
+        <select
           name="segmento_key"
-          placeholder="UUID Segmento"
           value={nuevaRelacion.segmento_key}
           onChange={manejarCambio}
-        />
+        >
+          <option value="">Selecciona un segmento</option>
+          {segmentos.map(s => (
+            <option key={s.key} value={s.key}>{s.nombre}</option>
+          ))}
+        </select>
+
         {editando ? (
           <>
             <button onClick={actualizarRelacion}>Actualizar</button>

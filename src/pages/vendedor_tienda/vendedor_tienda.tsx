@@ -1,11 +1,10 @@
-// ============================ VendedorTienda.tsx ============================
 import React, { useEffect, useState, ChangeEvent } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import '../../components/css/vendedor_tienda.css';
 
-const PRIMARY_API = 'https://autos-flask-umg-backend-ajbqcxhaaudjbdf0.mexicocentral-01.azurewebsites.net/ventas/vendedor/tienda';
-const FALLBACK_API = 'http://127.0.0.1:5000/ventas/vendedor/tienda';
+const PRIMARY_API = 'https://autos-flask-umg-backend-ajbqcxhaaudjbdf0.mexicocentral-01.azurewebsites.net/ventas';
+const FALLBACK_API = 'http://127.0.0.1:5000/ventas';
 
 const axiosWithFallback = async (method: 'get' | 'post' | 'put', path: string, data?: any) => {
   try {
@@ -23,47 +22,87 @@ interface VendedorTienda {
   activo?: boolean;
 }
 
+interface Opcion {
+  key: string;
+  nombre: string;
+}
+
 const VendedorTienda: React.FC = () => {
   const [registros, setRegistros] = useState<VendedorTienda[]>([]);
-  const [nuevoRegistro, setNuevoRegistro] = useState<Omit<VendedorTienda, 'id' | 'activo'>>({
-    vendedor_key: '',
-    tienda_key: ''
-  });
-  const [editandoId, setEditandoId] = useState<string | null>(null);
+  const [registroActual, setRegistroActual] = useState<Omit<VendedorTienda, 'activo'>>({ vendedor_key: '', tienda_key: '' });
+  const [editando, setEditando] = useState<boolean>(false);
   const [busquedaId, setBusquedaId] = useState('');
+  const [vendedores, setVendedores] = useState<Opcion[]>([]);
+  const [tiendas, setTiendas] = useState<Opcion[]>([]);
+  const { id } = useParams();
   const navigate = useNavigate();
 
   const obtenerRegistros = () => {
-    axiosWithFallback('get', '/get')
+    axiosWithFallback('get', '/vendedor/tienda/get')
       .then(res => setRegistros(res.data.vendedor_tienda || []))
+      .catch(console.error);
+  };
+
+  const obtenerVendedores = () => {
+    axiosWithFallback('get', '/get/vendedor')
+      .then(res => {
+        const data = res.data.vendedores || [];
+        setVendedores(data.map((v: any) => ({ key: v.vendedor_key, nombre: v.nombre })));
+      })
+      .catch(console.error);
+  };
+
+  const obtenerTiendas = () => {
+    axiosWithFallback('get', '/get/tienda')
+      .then(res => {
+        const data = res.data.tiendas || [];
+        setTiendas(data.map((t: any) => ({ key: t.tienda_key, nombre: t.nombre_tienda })));
+      })
       .catch(console.error);
   };
 
   useEffect(() => {
     obtenerRegistros();
-  }, []);
+    obtenerVendedores();
+    obtenerTiendas();
 
-  const manejarCambio = (e: ChangeEvent<HTMLInputElement>) => {
+    if (id) {
+      axiosWithFallback('get', `/vendedor/tienda/get/${id}`)
+        .then(res => {
+          const r = res.data;
+          setRegistroActual({
+            id: r.id,
+            vendedor_key: r.vendedor_key,
+            tienda_key: r.tienda_key,
+            fecha_renuncia: r.fecha_renuncia || ''
+          });
+          setEditando(true);
+        })
+        .catch(console.error);
+    }
+  }, [id]);
+
+  const manejarCambio = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setNuevoRegistro(prev => ({ ...prev, [name]: value }));
+    setRegistroActual(prev => ({ ...prev, [name]: value }));
   };
 
   const crearRegistro = () => {
-    if (!nuevoRegistro.vendedor_key || !nuevoRegistro.tienda_key) return;
+    if (!registroActual.vendedor_key || !registroActual.tienda_key) return;
 
-    axiosWithFallback('post', '/post', nuevoRegistro)
+    axiosWithFallback('post', '/vendedor/tienda/post', registroActual)
       .then(() => {
         obtenerRegistros();
-        setNuevoRegistro({ vendedor_key: '', tienda_key: '' });
+        setRegistroActual({ vendedor_key: '', tienda_key: '' });
       })
       .catch(console.error);
   };
 
   const actualizarRegistro = () => {
-    if (!editandoId || !nuevoRegistro.fecha_renuncia) return;
+    if (!registroActual.id || !registroActual.fecha_renuncia) return;
 
-    axiosWithFallback('put', `/put/${editandoId}`, {
-      fecha_renuncia: nuevoRegistro.fecha_renuncia
+    axiosWithFallback('put', `/vendedor/tienda/put/${registroActual.id}`, {
+      fecha_renuncia: registroActual.fecha_renuncia
     })
       .then(() => {
         obtenerRegistros();
@@ -72,22 +111,10 @@ const VendedorTienda: React.FC = () => {
       .catch(console.error);
   };
 
-  const buscarPorId = () => {
-    if (!busquedaId) return;
-
-    axiosWithFallback('get', `/get/${busquedaId}`)
-      .then(res => console.log(res.data))
-      .catch(console.error);
-  };
-
-  const iniciarEdicion = (registro: VendedorTienda) => {
-    setEditandoId(registro.id!);
-    setNuevoRegistro({ ...registro });
-  };
-
   const cancelarEdicion = () => {
-    setEditandoId(null);
-    setNuevoRegistro({ vendedor_key: '', tienda_key: '' });
+    setEditando(false);
+    setRegistroActual({ vendedor_key: '', tienda_key: '', fecha_renuncia: '' });
+    navigate('/lista-vendedor-tienda');
   };
 
   return (
@@ -101,36 +128,45 @@ const VendedorTienda: React.FC = () => {
           value={busquedaId}
           onChange={(e) => setBusquedaId(e.target.value)}
         />
-        <button onClick={buscarPorId}>Buscar</button>
+        <button onClick={() => navigate(`/vendedor-tienda/${busquedaId}`)}>Buscar</button>
         <button onClick={() => navigate('/lista-vendedor-tienda')}>Ver Lista</button>
       </div>
 
       <div className="formulario">
-        <input
-          type="text"
+        <select
           name="vendedor_key"
-          placeholder="ID Vendedor"
-          value={nuevoRegistro.vendedor_key}
+          value={registroActual.vendedor_key}
           onChange={manejarCambio}
-          disabled={!!editandoId}
-        />
-        <input
-          type="text"
+          disabled={editando}
+        >
+          <option value="">Selecciona un vendedor</option>
+          {vendedores.map(v => (
+            <option key={v.key} value={v.key}>{v.nombre}</option>
+          ))}
+        </select>
+
+        <select
           name="tienda_key"
-          placeholder="ID Tienda"
-          value={nuevoRegistro.tienda_key}
+          value={registroActual.tienda_key}
           onChange={manejarCambio}
-          disabled={!!editandoId}
-        />
-        {editandoId && (
+          disabled={editando}
+        >
+          <option value="">Selecciona una tienda</option>
+          {tiendas.map(t => (
+            <option key={t.key} value={t.key}>{t.nombre}</option>
+          ))}
+        </select>
+
+        {editando && (
           <input
             type="date"
             name="fecha_renuncia"
-            value={nuevoRegistro.fecha_renuncia || ''}
+            value={registroActual.fecha_renuncia || ''}
             onChange={manejarCambio}
           />
         )}
-        {editandoId ? (
+
+        {editando ? (
           <>
             <button onClick={actualizarRegistro}>Actualizar</button>
             <button onClick={cancelarEdicion} className="btn-cancelar">Cancelar</button>

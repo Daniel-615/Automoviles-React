@@ -8,11 +8,11 @@ const FALLBACK_API = 'http://localhost:5000/ventas';
 
 interface Region {
   region_key?: string;
-  region_nombre: string;
+  nombre: string;
 }
 
 const Region: React.FC = () => {
-  const [nuevaRegion, setNuevaRegion] = useState<Region>({ region_nombre: '' });
+  const [nuevaRegion, setNuevaRegion] = useState<Region>({ nombre: '' });
   const [editando, setEditando] = useState<string | null>(null);
   const [busquedaId, setBusquedaId] = useState('');
   const { id } = useParams();
@@ -31,8 +31,8 @@ const Region: React.FC = () => {
       apiRequest('get', `/get/region/${id}`)
         .then(res => {
           const r = res.data;
-          setNuevaRegion({ region_nombre: r.region_nombre });
-          setEditando(r.region_key || r.region_id);
+          setNuevaRegion({ nombre: r.nombre });
+          setEditando(id);
         })
         .catch(err => console.error('Región no encontrada:', err));
     }
@@ -43,36 +43,43 @@ const Region: React.FC = () => {
   };
 
   const crearRegion = () => {
-    if (!nuevaRegion.region_nombre) return;
+    if (!nuevaRegion.nombre.trim()) return;
 
-    apiRequest('post', '/post/region', nuevaRegion)
-      .then(() => setNuevaRegion({ region_nombre: '' }))
+    apiRequest('post', '/post/region', { region_nombre: nuevaRegion.nombre })
+      .then(() => {
+        setNuevaRegion({ nombre: '' });
+        setEditando(null);
+      })
       .catch(err => console.error('Error al crear la región:', err));
   };
 
   const actualizarRegion = () => {
     if (!editando) return;
 
-    apiRequest('put', `/put/region/${editando}`, { region_nombre: nuevaRegion.region_nombre })
-      .then(() => cancelarEdicion())
+    apiRequest('put', `/put/region/${editando}`, { region_nombre: nuevaRegion.nombre })
+      .then(() => {
+        cancelarEdicion();
+      })
       .catch(err => console.error('Error al actualizar la región:', err));
   };
 
   const buscarRegionPorId = () => {
-    if (!busquedaId) return;
+    if (!busquedaId.trim()) return;
 
     apiRequest('get', `/get/region/${busquedaId}`)
       .then(res => {
         const r = res.data;
-        setNuevaRegion({ region_nombre: r.region_nombre });
-        setEditando(r.region_key || r.region_id);
+        setNuevaRegion({ nombre: r.nombre });
+        setEditando(busquedaId);
       })
       .catch(err => console.error('Región no encontrada:', err));
   };
 
   const cancelarEdicion = () => {
     setEditando(null);
-    setNuevaRegion({ region_nombre: '' });
+    setNuevaRegion({ nombre: '' });
+    setBusquedaId('');
+    navigate('/lista-regiones');
   };
 
   return (
@@ -92,9 +99,9 @@ const Region: React.FC = () => {
       <div className="formulario">
         <input
           type="text"
-          name="region_nombre"
+          name="nombre"
           placeholder="Nombre de región"
-          value={nuevaRegion.region_nombre}
+          value={nuevaRegion.nombre}
           onChange={manejarCambio}
         />
         {editando ? (

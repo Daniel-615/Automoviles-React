@@ -100,6 +100,7 @@ function App() {
           <Route path="/ciudades/:id" element={<Ciudad />} />
           <Route path="/segmentos/:id" element={<Segmento />} />
           <Route path="/region/:id" element={<Region />} />
+          <Route path="/vendedor/:id" element={<Vendedor/>}/>
 
           <Route path="*" element={<h2>404 - Página no encontrada</h2>} />
         </Routes>

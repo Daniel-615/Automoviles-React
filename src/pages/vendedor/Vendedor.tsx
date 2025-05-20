@@ -1,15 +1,15 @@
-import React, { useState, ChangeEvent } from 'react';
-import { useNavigate } from 'react-router-dom'; 
+import React, { useEffect, useState, ChangeEvent } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
-import '../../components/css/vendedor.css'
+import '../../components/css/vendedor.css';
+
 const PRIMARY_API = 'https://autos-flask-umg-backend-ajbqcxhaaudjbdf0.mexicocentral-01.azurewebsites.net/ventas';
 const FALLBACK_API = 'http://127.0.0.1:5000/ventas';
 
 const axiosWithFallback = async (method: 'get' | 'post' | 'put', path: string, data?: any) => {
   try {
     return await axios({ method, url: `${PRIMARY_API}${path}`, data });
-  } catch (error) {
-    console.warn('Fallo la ruta principal. Usando fallback...');
+  } catch {
     return await axios({ method, url: `${FALLBACK_API}${path}`, data });
   }
 };
@@ -24,19 +24,37 @@ export interface Vendedor {
 }
 
 const Vendedor: React.FC = () => {
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
+  const { id } = useParams();
   const [nuevoVendedor, setNuevoVendedor] = useState<Omit<Vendedor, 'vendedor_key' | 'activo'>>({
-    vendedor_id: '',
-    nombre: '',
-    edad: 0,
-    salario: 0
+    vendedor_id: '', nombre: '', edad: 0, salario: 0
   });
-  const [editando, setEditando] = useState<Vendedor | null>(null);
+  const [editando, setEditando] = useState<string | null>(null);
   const [busquedaId, setBusquedaId] = useState('');
+
+  useEffect(() => {
+    if (id) {
+      axiosWithFallback('get', `/get/vendedor/${id}`)
+        .then(res => {
+          const v = res.data;
+          setNuevoVendedor({
+            vendedor_id: v.vendedor_id,
+            nombre: v.nombre,
+            edad: v.edad,
+            salario: v.salario
+          });
+          setEditando(v.vendedor_key || v.vendedor_id);
+        })
+        .catch(err => console.error('Error al cargar vendedor:', err));
+    }
+  }, [id]);
 
   const manejarCambio = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setNuevoVendedor({ ...nuevoVendedor, [name]: name === 'edad' || name === 'salario' ? parseFloat(value) : value });
+    setNuevoVendedor(prev => ({
+      ...prev,
+      [name]: name === 'edad' || name === 'salario' ? parseFloat(value) : value
+    }));
   };
 
   const crearVendedor = () => {
@@ -50,15 +68,38 @@ const Vendedor: React.FC = () => {
       .catch(err => console.error('Error al crear vendedor:', err));
   };
 
+  const actualizarVendedor = () => {
+    if (!editando) return;
+
+    axiosWithFallback('put', `/put/vendedor/${editando}`, nuevoVendedor)
+      .then(() => {
+        setEditando(null);
+        setNuevoVendedor({ vendedor_id: '', nombre: '', edad: 0, salario: 0 });
+        navigate('/vendedores');
+      })
+      .catch(err => console.error('Error al actualizar vendedor:', err));
+  };
+
   const buscarVendedorPorId = () => {
     if (!busquedaId) return;
 
     axiosWithFallback('get', `/get/vendedor/${busquedaId}`)
       .then(res => {
         const v = res.data;
-        console.log(`Vendedor encontrado: ${v.nombre} - Activo: ${v.activo}`);
+        setNuevoVendedor({
+          vendedor_id: v.vendedor_id,
+          nombre: v.nombre,
+          edad: v.edad,
+          salario: v.salario
+        });
+        setEditando(v.vendedor_key || v.vendedor_id);
       })
       .catch(err => console.error('Vendedor no encontrado:', err));
+  };
+
+  const cancelarEdicion = () => {
+    setEditando(null);
+    setNuevoVendedor({ vendedor_id: '', nombre: '', edad: 0, salario: 0 });
   };
 
   return (
@@ -80,7 +121,15 @@ const Vendedor: React.FC = () => {
         <input type="text" name="nombre" placeholder="Nombre" value={nuevoVendedor.nombre} onChange={manejarCambio} />
         <input type="number" name="edad" placeholder="Edad" value={nuevoVendedor.edad} onChange={manejarCambio} />
         <input type="number" name="salario" placeholder="Salario" value={nuevoVendedor.salario} onChange={manejarCambio} />
-        <button onClick={crearVendedor}>Crear</button>
+
+        {editando ? (
+          <>
+            <button onClick={actualizarVendedor}>Actualizar</button>
+            <button onClick={cancelarEdicion} className="btn-cancelar">Cancelar</button>
+          </>
+        ) : (
+          <button onClick={crearVendedor}>Crear</button>
+        )}
       </div>
 
       <div className="mostrar-vendedores">

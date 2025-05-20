@@ -39,7 +39,7 @@ const ListaVendedorTienda: React.FC = () => {
     <div className="lista-container">
       <div className="lista-header">
         <h1>Relaciones Vendedor - Tienda</h1>
-        <button className="btn-volver" onClick={() => navigate('/vendedor-tienda')}>
+        <button className="btn-volver" onClick={() => navigate('/vendedor_tienda')}>
           ← Volver a Gestión
         </button>
       </div>
@@ -49,7 +49,7 @@ const ListaVendedorTienda: React.FC = () => {
       ) : (
         <div className="tarjetas-vendedores">
           {registros.map((r) => (
-            <div className="tarjeta" key={r.id}>
+            <div className="tarjeta" key={r.id} onClick={() => navigate(`/vendedor-tienda/${r.id}`)} style={{ cursor: 'pointer' }}>
               <p><strong>Vendedor:</strong> {r.vendedor_key}</p>
               <p><strong>Tienda:</strong> {r.tienda_key}</p>
               <p><strong>Activo:</strong> {r.activo ? 'Sí' : 'No'}</p>

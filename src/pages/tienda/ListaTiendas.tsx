@@ -39,6 +39,10 @@ const ListaTiendas: React.FC = () => {
       .catch(err => console.error('Error al obtener tiendas:', err));
   }, []);
 
+  const editarTienda = (uuid: string) => {
+    navigate(`/tiendas?uuid=${uuid}`);
+  };
+
   return (
     <div className="lista-container">
       <div className="lista-header">
@@ -53,7 +57,12 @@ const ListaTiendas: React.FC = () => {
       ) : (
         <div className="tarjetas-vendedores">
           {tiendas.map((t) => (
-            <div className="tarjeta" key={t.tienda_key}>
+            <div
+              className="tarjeta"
+              key={t.tienda_key}
+              onClick={() => editarTienda(t.tienda_key || '')}
+              style={{ cursor: 'pointer' }}
+            >
               <h3>{t.nombre_tienda}</h3>
               <p><strong>ID:</strong> {t.tienda_id}</p>
               <p><strong>Dirección:</strong> {t.direccion}</p>

@@ -1,4 +1,3 @@
-// ============================ Ciudades.tsx ============================
 import React, { useState, ChangeEvent, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -14,12 +13,18 @@ interface Ciudad {
   region_key?: string;
 }
 
+interface Region {
+  region_key: string;
+  region_nombre: string;
+}
+
 const Ciudades: React.FC = () => {
   const [nuevaCiudad, setNuevaCiudad] = useState<Omit<Ciudad, 'ciudad_id'>>({
     ciudad_nombre: '',
     ciudad_key: '',
     region_key: ''
   });
+  const [regiones, setRegiones] = useState<Region[]>([]);
   const [editando, setEditando] = useState<boolean>(false);
   const [busquedaId, setBusquedaId] = useState('');
   const navigate = useNavigate();
@@ -32,6 +37,15 @@ const Ciudades: React.FC = () => {
       return await axios({ method, url: `${FALLBACK_API}${endpoint}`, data: body });
     }
   };
+
+  useEffect(() => {
+    apiRequest('get', '/get/region')
+      .then(res => {
+        const lista = res.data.regiones || res.data;
+        setRegiones(lista);
+      })
+      .catch(err => console.error('Error al cargar regiones:', err));
+  }, []);
 
   useEffect(() => {
     if (id) {
@@ -51,20 +65,16 @@ const Ciudades: React.FC = () => {
     }
   }, [id]);
 
-  const manejarCambio = (e: ChangeEvent<HTMLInputElement>) => {
+  const manejarCambio = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setNuevaCiudad(prev => ({ ...prev, [name]: value }));
   };
 
   const crearCiudad = () => {
-    const { ciudad_nombre, ciudad_key, region_key } = nuevaCiudad;
-    if (!ciudad_nombre || !ciudad_key || !region_key) return;
+    const { ciudad_nombre, region_key } = nuevaCiudad;
+    if (!ciudad_nombre || !region_key) return;
 
-    const payload = {
-      ciudad_id: ciudad_key,
-      ciudad_nombre,
-      region_key
-    };
+    const payload = { ciudad_nombre, region_key };
 
     apiRequest('post', '/post/ciudad', payload)
       .then(() => setNuevaCiudad({ ciudad_nombre: '', ciudad_key: '', region_key: '' }))
@@ -128,20 +138,21 @@ const Ciudades: React.FC = () => {
           value={nuevaCiudad.ciudad_nombre}
           onChange={manejarCambio}
         />
-        <input
-          name="ciudad_key"
-          placeholder="UUID ciudad"
-          value={nuevaCiudad.ciudad_key}
-          onChange={manejarCambio}
-          readOnly={editando}
-        />
-        <input
-          name="region_key"
-          placeholder="UUID región"
-          value={nuevaCiudad.region_key}
-          onChange={manejarCambio}
-          readOnly={editando}
-        />
+
+        {!editando && (
+          <select
+            name="region_key"
+            value={nuevaCiudad.region_key}
+            onChange={manejarCambio}
+          >
+            <option value="">-- Selecciona una región --</option>
+            {regiones.map(region => (
+              <option key={region.region_key} value={region.region_key}>
+                {region.region_nombre}
+              </option>
+            ))}
+          </select>
+        )}
 
         {editando ? (
           <>
