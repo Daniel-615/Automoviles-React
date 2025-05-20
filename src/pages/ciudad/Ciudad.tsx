@@ -1,5 +1,6 @@
-import React, { useEffect, useState, ChangeEvent } from 'react';
+import React, { useState, ChangeEvent } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import '../../components/css/Ciudades.css';
 
 const PRIMARY_API = 'https://microservicio_ventas.serveo.net/ventas';
@@ -13,7 +14,6 @@ interface Ciudad {
 }
 
 const Ciudades: React.FC = () => {
-  const [ciudades, setCiudades] = useState<Ciudad[]>([]);
   const [nuevaCiudad, setNuevaCiudad] = useState<Omit<Ciudad, 'ciudad_id'>>({
     ciudad_nombre: '',
     ciudad_key: '',
@@ -21,6 +21,7 @@ const Ciudades: React.FC = () => {
   });
   const [editando, setEditando] = useState<Ciudad | null>(null);
   const [busquedaId, setBusquedaId] = useState('');
+  const navigate = useNavigate();
 
   const apiRequest = async (method: 'get' | 'post' | 'put', endpoint: string, body?: any) => {
     try {
@@ -29,27 +30,6 @@ const Ciudades: React.FC = () => {
       return await axios({ method, url: `${FALLBACK_API}${endpoint}`, data: body });
     }
   };
-
-  const obtenerCiudades = () => {
-    apiRequest('get', '/get/ciudad')
-      .then(res => {
-        const datos = res.data.ciudades || res.data;
-        const formateadas = datos.map((c: any) => ({
-          ciudad_key: c.ciudad_key || c.ciudad_id,
-          ciudad_id: c.ciudad_id || c.ciudad_key,
-          ciudad_nombre: c.ciudad_nombre || c.nombre,
-          region_key: c.region_key || ''
-        })).filter((c: Ciudad) => c.ciudad_key && c.ciudad_nombre);
-        setCiudades(formateadas);
-      })
-      .catch(err => {
-        console.error('Error al obtener ciudades:', err);
-      });
-  };
-
-  useEffect(() => {
-    obtenerCiudades();
-  }, []);
 
   const manejarCambio = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -67,7 +47,6 @@ const Ciudades: React.FC = () => {
 
     apiRequest('post', '/post/ciudad', payload)
       .then(() => {
-        obtenerCiudades();
         setNuevaCiudad({ ciudad_nombre: '', ciudad_key: '', region_key: '' });
       })
       .catch(err => {
@@ -82,7 +61,6 @@ const Ciudades: React.FC = () => {
 
     apiRequest('put', `/put/ciudad/${editando.ciudad_key}`, payload)
       .then(() => {
-        obtenerCiudades();
         cancelarEdicion();
       })
       .catch(err => {
@@ -161,19 +139,9 @@ const Ciudades: React.FC = () => {
         )}
       </div>
 
-      <ul className="lista-ciudades">
-        {ciudades.map((c) => (
-          <li key={c.ciudad_key}>
-            <div>
-              <strong>{c.ciudad_nombre}</strong> - {c.ciudad_id}
-            </div>
-            <div>
-              <button onClick={() => iniciarEdicion(c)}>Editar</button>
-              <button onClick={() => obtenerCiudadPorId(c.ciudad_key)} className="btn-ver">Ver</button>
-            </div>
-          </li>
-        ))}
-      </ul>
+      <div className="mostrar-listado">
+        <button onClick={() => navigate('/lista-ciudades')}>Ir al listado de ciudades</button>
+      </div>
     </div>
   );
 };

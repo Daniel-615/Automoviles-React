@@ -1,5 +1,6 @@
-import React, { useEffect, useState, ChangeEvent } from 'react';
+import React, { useState, ChangeEvent } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import '../../components/css/region.css';
 
 const PRIMARY_API = 'https://autos-flask-umg-backend-ajbqcxhaaudjbdf0.mexicocentral-01.azurewebsites.net/ventas';
@@ -11,12 +12,12 @@ interface Region {
 }
 
 const Region: React.FC = () => {
-  const [regiones, setRegiones] = useState<Region[]>([]);
   const [nuevaRegion, setNuevaRegion] = useState<Region>({ region_nombre: '' });
   const [editando, setEditando] = useState<string | null>(null);
   const [busquedaId, setBusquedaId] = useState('');
+  const navigate = useNavigate();
 
-  const apiRequest = async (method: 'get' | 'post' | 'put', endpoint: string, body?: any) => {
+  const apiRequest = async (method: 'post' | 'put' | 'get', endpoint: string, body?: any) => {
     const url = `${PRIMARY_API}${endpoint}`;
     const fallbackUrl = `${FALLBACK_API}${endpoint}`;
     try {
@@ -25,18 +26,6 @@ const Region: React.FC = () => {
       return await axios({ method, url: fallbackUrl, data: body });
     }
   };
-
-  const obtenerRegiones = () => {
-    apiRequest('get', '/get/region')
-      .then(res => setRegiones(res.data.regiones || []))
-      .catch(err => {
-        console.error('Error al obtener regiones:', err);
-      });
-  };
-
-  useEffect(() => {
-    obtenerRegiones();
-  }, []);
 
   const manejarCambio = (e: ChangeEvent<HTMLInputElement>) => {
     setNuevaRegion({ ...nuevaRegion, [e.target.name]: e.target.value });
@@ -47,7 +36,6 @@ const Region: React.FC = () => {
 
     apiRequest('post', '/post/region', nuevaRegion)
       .then(() => {
-        obtenerRegiones();
         setNuevaRegion({ region_nombre: '' });
       })
       .catch(err => {
@@ -60,7 +48,6 @@ const Region: React.FC = () => {
 
     apiRequest('put', `/put/region/${editando}`, { region_nombre: nuevaRegion.region_nombre })
       .then(() => {
-        obtenerRegiones();
         cancelarEdicion();
       })
       .catch(err => {
@@ -125,17 +112,10 @@ const Region: React.FC = () => {
         )}
       </div>
 
-      {/* Lista */}
-      <ul className="lista-regiones">
-        {regiones.map((r) => (
-          <li key={r.region_key}>
-            <strong>{r.region_nombre}</strong> - {r.region_key}
-            <div>
-              <button onClick={() => iniciarEdicion(r)}>Editar</button>
-            </div>
-          </li>
-        ))}
-      </ul>
+      {/* Redirección al listado */}
+      <div className="mostrar-listado">
+        <button onClick={() => navigate('/lista-regiones')}>Ir al listado de regiones</button>
+      </div>
     </div>
   );
 };

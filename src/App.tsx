@@ -1,5 +1,5 @@
 import { Routes, Route } from 'react-router-dom';
-import Navbar from './components/navbar/navbar'
+import Navbar from './components/navbar/navbar';
 import Tiendas from './pages/tiendaBi/Tiendas';
 import Gerentes from './pages/gerente/Gerente';
 import Cliente from './pages/cliente/Cliente';
@@ -10,8 +10,14 @@ import Segmento from './pages/segmento/Segmento';
 import Tienda from './pages/tienda/Tienda';
 import Vendedor from './pages/vendedor/Vendedor';
 import VendedorTienda from './pages/vendedor_tienda/vendedor_tienda';
-
 import ListaVendedores from './pages/vendedor/listaVendedores';
+import ListaClientes from './pages/cliente/ListaClientes';
+import ListaSegmentos from './pages/segmento/ListaSegmentos'
+import ListaRegiones from './pages/region/ListaRegiones';
+import ListaCiudades from './pages/ciudad/ListaCiudades'
+import ListaTiendas from './pages/tienda/ListaTiendas';
+import ListaClienteSegmento from './pages/cliente_segmento/ListaClienteSegmento';
+import ListaVendedorTiendas from './pages/vendedor_tienda/ListasVendedorTiendas';
 import Carousel from 'react-multi-carousel';
 import 'react-multi-carousel/lib/styles.css';
 import './App.css';
@@ -73,15 +79,22 @@ function App() {
           <Route path="/tiendasBi" element={<Tiendas />} />
           <Route path="/gerentes" element={<Gerentes />} />
           <Route path="/ciudades" element={<Ciudad />} />
-          <Route path="/clientes" element={<Cliente />} />
+          <Route path="/cliente" element={<Cliente />} />
           <Route path="/cliente-segmento" element={<ClienteSegmento />} />
           <Route path="/region" element={<Region />} />
           <Route path="/segmentos" element={<Segmento />} />
           <Route path="/tiendas" element={<Tienda />} />
           <Route path="/vendedor" element={<Vendedor />} />
           <Route path="/vendedor_tienda" element={<VendedorTienda />} />
-                    
           <Route path="/vendedores" element={<ListaVendedores />} />
+          <Route path="/clientes" element={<ListaClientes />} />
+          <Route path="/lista-segmentos" element={<ListaSegmentos />} />
+          <Route path="/lista-regiones" element={<ListaRegiones />} />
+          <Route path="/lista-ciudades" element={<ListaCiudades />} />
+          <Route path="/lista-tiendas" element={<ListaTiendas />} />
+          <Route path="/lista-cliente-segmento" element={<ListaClienteSegmento />} />
+          <Route path="/lista-vendedor-tienda" element={<ListaVendedorTiendas />} />
+          <Route path="*" element={<h2>404 - Página no encontrada</h2>} />
         </Routes>
       </main>
     </div>

@@ -1,5 +1,6 @@
 import React, { useEffect, useState, ChangeEvent } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import '../../components/css/Tiendas.css';
 
 const PRIMARY_API = 'https://autos-flask-umg-backend-ajbqcxhaaudjbdf0.mexicocentral-01.azurewebsites.net/ventas';
@@ -18,16 +19,10 @@ interface Tienda {
 }
 
 const Tienda: React.FC = () => {
-  const [tiendas, setTiendas] = useState<Tienda[]>([]);
+  const navigate = useNavigate();
   const [nuevaTienda, setNuevaTienda] = useState<Omit<Tienda, 'tienda_key'>>({
-    tienda_id: '',
-    nombre_tienda: '',
-    direccion: '',
-    ciudad: '',
-    tamaño_m2: 0,
-    horario_apertura: '',
-    horario_cierre: '',
-    gerente_key: ''
+    tienda_id: '', nombre_tienda: '', direccion: '', ciudad: '', tamaño_m2: 0,
+    horario_apertura: '', horario_cierre: '', gerente_key: ''
   });
   const [editando, setEditando] = useState<string | null>(null);
   const [busquedaId, setBusquedaId] = useState('');
@@ -39,16 +34,6 @@ const Tienda: React.FC = () => {
       return await axios({ method: metodo as any, url: `${FALLBACK_API}${endpoint}`, data });
     }
   };
-
-  const obtenerTiendas = () => {
-    hacerPeticion('get', '/get/tienda')
-      .then(res => setTiendas(res.data.tiendas || []))
-      .catch(err => console.error('Error al obtener tiendas:', err));
-  };
-
-  useEffect(() => {
-    obtenerTiendas();
-  }, []);
 
   const manejarCambio = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -66,10 +51,7 @@ const Tienda: React.FC = () => {
     }
 
     hacerPeticion('post', '/post/tienda', nuevaTienda)
-      .then(() => {
-        obtenerTiendas();
-        cancelarEdicion();
-      })
+      .then(() => cancelarEdicion())
       .catch(err => console.error('Error al crear tienda:', err));
   };
 
@@ -83,10 +65,7 @@ const Tienda: React.FC = () => {
     }
 
     hacerPeticion('put', `/put/tienda/${editando}`, { horario_apertura, horario_cierre })
-      .then(() => {
-        obtenerTiendas();
-        cancelarEdicion();
-      })
+      .then(() => cancelarEdicion())
       .catch(err => console.error('Error al actualizar tienda:', err));
   };
 
@@ -118,14 +97,8 @@ const Tienda: React.FC = () => {
   const cancelarEdicion = () => {
     setEditando(null);
     setNuevaTienda({
-      tienda_id: '',
-      nombre_tienda: '',
-      direccion: '',
-      ciudad: '',
-      tamaño_m2: 0,
-      horario_apertura: '',
-      horario_cierre: '',
-      gerente_key: ''
+      tienda_id: '', nombre_tienda: '', direccion: '', ciudad: '', tamaño_m2: 0,
+      horario_apertura: '', horario_cierre: '', gerente_key: ''
     });
   };
 
@@ -133,7 +106,6 @@ const Tienda: React.FC = () => {
     <div className="tienda-container">
       <h2>Gestión de Tiendas</h2>
 
-      {/* Buscar por ID */}
       <div className="form-busqueda">
         <input
           type="text"
@@ -144,15 +116,14 @@ const Tienda: React.FC = () => {
         <button onClick={buscarTiendaPorId}>Buscar</button>
       </div>
 
-      {/* Formulario */}
       <div className="formulario">
         <input name="tienda_id" placeholder="ID" value={nuevaTienda.tienda_id} onChange={manejarCambio} disabled={!!editando} />
         <input name="nombre_tienda" placeholder="Nombre" value={nuevaTienda.nombre_tienda} onChange={manejarCambio} />
         <input name="direccion" placeholder="Dirección" value={nuevaTienda.direccion} onChange={manejarCambio} />
         <input name="ciudad" placeholder="Ciudad (UUID)" value={nuevaTienda.ciudad} onChange={manejarCambio} />
         <input name="tamaño_m2" type="number" placeholder="Tamaño (m²)" value={nuevaTienda.tamaño_m2} onChange={manejarCambio} />
-        <input name="horario_apertura" type="time" placeholder="Apertura (HH:MM)" value={nuevaTienda.horario_apertura} onChange={manejarCambio} />
-        <input name="horario_cierre" type="time" placeholder="Cierre (HH:MM)" value={nuevaTienda.horario_cierre} onChange={manejarCambio} />
+        <input name="horario_apertura" type="time" value={nuevaTienda.horario_apertura} onChange={manejarCambio} />
+        <input name="horario_cierre" type="time" value={nuevaTienda.horario_cierre} onChange={manejarCambio} />
         <input name="gerente_key" placeholder="Gerente (UUID)" value={nuevaTienda.gerente_key} onChange={manejarCambio} />
 
         {editando ? (
@@ -165,17 +136,9 @@ const Tienda: React.FC = () => {
         )}
       </div>
 
-      {/* Lista */}
-      <ul className="lista-tiendas">
-        {tiendas.map((t) => (
-          <li key={t.tienda_key}>
-            <strong>{t.nombre_tienda}</strong> - {t.tienda_id}<br />
-            Gerente: <em>{t.gerente_key}</em><br />
-            ({t.horario_apertura} - {t.horario_cierre})
-            <button onClick={() => iniciarEdicion(t)}>Editar</button>
-          </li>
-        ))}
-      </ul>
+      <div className="mostrar-tiendas">
+        <button onClick={() => navigate('/lista-tiendas')}>Ir al listado</button>
+      </div>
     </div>
   );
 };

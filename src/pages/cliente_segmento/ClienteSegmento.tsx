@@ -1,5 +1,7 @@
+// ============================ ClienteSegmento.tsx ============================
 import React, { useEffect, useState, ChangeEvent } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import '../../components/css/cliente_segmento.css';
 
 const PRIMARY_API = 'https://autos-flask-umg-backend-ajbqcxhaaudjbdf0.mexicocentral-01.azurewebsites.net/ventas';
@@ -19,6 +21,7 @@ const ClienteSegmento: React.FC = () => {
   });
   const [editando, setEditando] = useState<ClienteSegmento | null>(null);
   const [busquedaId, setBusquedaId] = useState('');
+  const navigate = useNavigate();
 
   const apiRequest = async (method: 'get' | 'post' | 'put', endpoint: string, body?: any) => {
     try {
@@ -97,6 +100,7 @@ const ClienteSegmento: React.FC = () => {
           onChange={(e) => setBusquedaId(e.target.value)}
         />
         <button onClick={buscarRelacionPorId}>Buscar</button>
+        <button onClick={() => navigate('/lista-cliente-segmento')}>Ver Lista</button>
       </div>
 
       <div className="formulario">
@@ -124,15 +128,6 @@ const ClienteSegmento: React.FC = () => {
           <button onClick={crearRelacion}>Crear</button>
         )}
       </div>
-
-      <ul className="lista-relaciones">
-        {relaciones.map((rel) => (
-          <li key={rel.cliente_segmento_key}>
-            Cliente: <strong>{rel.cliente_key}</strong> — Segmento: <strong>{rel.segmento_key}</strong>
-            <button onClick={() => iniciarEdicion(rel)}>Editar</button>
-          </li>
-        ))}
-      </ul>
     </div>
   );
 };

@@ -53,6 +53,7 @@
 
 .nav-links li {
   position: relative;
+  list-style: none;
 }
 
 .nav-links a,
@@ -90,6 +91,8 @@
 
 .dropdown-menu li {
   padding: 0.3rem 0;
+  list-style: none; /* ✅ Aquí se elimina el puntito */
+  margin: 0;
 }
 
 .dropdown-menu a {
@@ -145,6 +148,7 @@
 
   .dropdown-menu li {
     padding-left: 0.5rem;
+    list-style: none;
   }
 
   .dropdown:hover > .dropdown-menu {

@@ -1,5 +1,6 @@
-import React, { useEffect, useState, ChangeEvent } from 'react';
+import React, { useState, ChangeEvent } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import '../../components/css/segmento.css';
 
 const PRIMARY_URL = 'https://autos-flask-umg-backend-ajbqcxhaaudjbdf0.mexicocentral-01.azurewebsites.net/ventas';
@@ -21,25 +22,13 @@ interface Segmento {
 }
 
 const Segmento: React.FC = () => {
-  const [segmentos, setSegmentos] = useState<Segmento[]>([]);
   const [nuevoSegmento, setNuevoSegmento] = useState<Omit<Segmento, 'segmento_key'>>({
     segmento_id: '',
     nombre: ''
   });
   const [editando, setEditando] = useState<string | null>(null);
   const [busquedaId, setBusquedaId] = useState('');
-
-  const obtenerSegmentos = () => {
-    hacerPeticion({ method: 'GET', url: '{BASE_URL}/get/segmento' })
-      .then(res => setSegmentos(res.data.segmentos || []))
-      .catch(err => {
-        console.error('Error al obtener segmentos:', err);
-      });
-  };
-
-  useEffect(() => {
-    obtenerSegmentos();
-  }, []);
+  const navigate = useNavigate();
 
   const manejarCambio = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -50,9 +39,8 @@ const Segmento: React.FC = () => {
     const { segmento_id, nombre } = nuevoSegmento;
     if (!segmento_id || !nombre) return;
 
-    hacerPeticion({ method: 'POST', url: '{BASE_URL}/post/segmento', data: nuevoSegmento })
+    hacerPeticion({ method: 'POST', url: `${PRIMARY_URL}/post/segmento`, data: nuevoSegmento })
       .then(() => {
-        obtenerSegmentos();
         setNuevoSegmento({ segmento_id: '', nombre: '' });
       })
       .catch(err => {
@@ -65,11 +53,10 @@ const Segmento: React.FC = () => {
 
     hacerPeticion({
       method: 'PUT',
-      url: `{BASE_URL}/put/segmento/${editando}`,
+      url: `${PRIMARY_URL}/put/segmento/${editando}`,
       data: { nombre: nuevoSegmento.nombre }
     })
       .then(() => {
-        obtenerSegmentos();
         cancelarEdicion();
       })
       .catch(err => {
@@ -80,7 +67,7 @@ const Segmento: React.FC = () => {
   const buscarSegmentoPorId = () => {
     if (!busquedaId) return;
 
-    hacerPeticion({ method: 'GET', url: `{BASE_URL}/get/segmento/${busquedaId}` })
+    hacerPeticion({ method: 'GET', url: `${PRIMARY_URL}/get/segmento/${busquedaId}` })
       .then(res => {
         const s = res.data;
         console.log(`Segmento encontrado: ID: ${s.segmento_id} - Nombre: ${s.nombre}`);
@@ -143,15 +130,10 @@ const Segmento: React.FC = () => {
         )}
       </div>
 
-      {/* Lista */}
-      <ul className="lista-segmentos">
-        {segmentos.map((s) => (
-          <li key={s.segmento_key}>
-            <strong>{s.nombre}</strong> - {s.segmento_id}
-            <button onClick={() => iniciarEdicion(s)}>Editar</button>
-          </li>
-        ))}
-      </ul>
+      {/* Botón para ver listado */}
+      <div className="mostrar-listado">
+        <button onClick={() => navigate('/lista-segmentos')}>Ir al listado de segmentos</button>
+      </div>
     </div>
   );
 };

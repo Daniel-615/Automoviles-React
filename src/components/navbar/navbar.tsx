@@ -33,6 +33,7 @@ const Navbar = () => {
               <li><Link to="/region">Región</Link></li>
               <li><Link to="/ciudades">Ciudades</Link></li>
               <li><Link to="/tiendas">Tiendas</Link></li>
+              <li><Link to="/gerentes">Gerente</Link></li>
             </ul>
           </li>
 

@@ -1,5 +1,7 @@
+// ============================ VendedorTienda.tsx ============================
 import React, { useEffect, useState, ChangeEvent } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import '../../components/css/vendedor_tienda.css';
 
 const PRIMARY_API = 'https://autos-flask-umg-backend-ajbqcxhaaudjbdf0.mexicocentral-01.azurewebsites.net/ventas/vendedor/tienda';
@@ -29,6 +31,7 @@ const VendedorTienda: React.FC = () => {
   });
   const [editandoId, setEditandoId] = useState<string | null>(null);
   const [busquedaId, setBusquedaId] = useState('');
+  const navigate = useNavigate();
 
   const obtenerRegistros = () => {
     axiosWithFallback('get', '/get')
@@ -99,6 +102,7 @@ const VendedorTienda: React.FC = () => {
           onChange={(e) => setBusquedaId(e.target.value)}
         />
         <button onClick={buscarPorId}>Buscar</button>
+        <button onClick={() => navigate('/lista-vendedor-tienda')}>Ver Lista</button>
       </div>
 
       <div className="formulario">
@@ -135,17 +139,6 @@ const VendedorTienda: React.FC = () => {
           <button onClick={crearRegistro}>Crear</button>
         )}
       </div>
-
-      <ul className="lista-registros">
-        {registros.map((r, i) => (
-          <li key={i}>
-            <div>
-              <strong>Vendedor:</strong> {r.vendedor_key} - <strong>Tienda:</strong> {r.tienda_key} - <strong>Activo:</strong> {r.activo ? 'Sí' : 'No'}
-            </div>
-            <button onClick={() => iniciarEdicion(r)}>Editar</button>
-          </li>
-        ))}
-      </ul>
     </div>
   );
 };
