@@ -47,7 +47,12 @@ const ListaClienteSegmento: React.FC = () => {
       ) : (
         <div className="tarjetas-vendedores">
           {relaciones.map((r) => (
-            <div className="tarjeta" key={r.cliente_segmento_key}>
+            <div
+              className="tarjeta"
+              key={r.cliente_segmento_key}
+              onClick={() => navigate(`/cliente-segmento/${r.cliente_segmento_key}`)}
+              style={{ cursor: 'pointer' }}
+            >
               <p><strong>Cliente:</strong> {r.cliente_key}</p>
               <p><strong>Segmento:</strong> {r.segmento_key}</p>
             </div>

@@ -31,7 +31,8 @@
   margin-bottom: 2rem;
 }
 
-input {
+input,
+select {
   padding: 0.6rem 1rem;
   font-size: 1rem;
   border: 1px solid #ccc;
@@ -39,13 +40,16 @@ input {
   background-color: white;
   color: #333;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  appearance: none;
+  width: 100%;
 }
 
 input::placeholder {
   color: #888;
 }
 
-input:focus {
+input:focus,
+select:focus {
   outline: none;
   border-color: #1565c0;
   box-shadow: 0 0 0 3px rgba(21, 101, 192, 0.2);
@@ -119,6 +123,7 @@ button:hover,
   }
 
   input,
+  select,
   button {
     width: 100%;
   }

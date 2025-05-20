@@ -62,7 +62,12 @@ const ListaClientes: React.FC = () => {
       ) : (
         <div className="tarjetas-vendedores">
           {clientes.map((c) => (
-            <div className="tarjeta" key={c.cliente_key}>
+            <div
+              className="tarjeta"
+              key={c.cliente_key}
+              onClick={() => navigate(`/cliente/${c.cliente_key}`)}
+              style={{ cursor: 'pointer' }}
+            >
               <h3>{c.nombre} {c.apellido}</h3>
               <p><strong>ID:</strong> {c.cliente_id}</p>
               <p><strong>Email:</strong> {c.email}</p>

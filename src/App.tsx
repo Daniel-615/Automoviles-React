@@ -94,6 +94,13 @@ function App() {
           <Route path="/lista-tiendas" element={<ListaTiendas />} />
           <Route path="/lista-cliente-segmento" element={<ListaClienteSegmento />} />
           <Route path="/lista-vendedor-tienda" element={<ListaVendedorTiendas />} />
+
+          <Route path="/cliente/:id" element={<Cliente />} />
+          <Route path="/cliente-segmento/:id" element={<ClienteSegmento />} />
+          <Route path="/ciudades/:id" element={<Ciudad />} />
+          <Route path="/segmentos/:id" element={<Segmento />} />
+          <Route path="/region/:id" element={<Region />} />
+
           <Route path="*" element={<h2>404 - Página no encontrada</h2>} />
         </Routes>
       </main>

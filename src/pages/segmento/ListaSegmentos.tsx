@@ -47,7 +47,7 @@ const ListaSegmentos: React.FC = () => {
       ) : (
         <div className="tarjetas-vendedores">
           {segmentos.map((s) => (
-            <div className="tarjeta" key={s.segmento_key}>
+            <div className="tarjeta" key={s.segmento_key} onClick={() => navigate(`/segmentos/${s.segmento_key}`)} style={{ cursor: 'pointer' }}>
               <h3>{s.nombre}</h3>
               <p><strong>ID:</strong> {s.segmento_id}</p>
             </div>

@@ -1,6 +1,6 @@
-import React, { useState, ChangeEvent } from 'react';
+import React, { useEffect, useState, ChangeEvent } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import '../../components/css/region.css';
 
 const PRIMARY_API = 'https://autos-flask-umg-backend-ajbqcxhaaudjbdf0.mexicocentral-01.azurewebsites.net/ventas';
@@ -15,17 +15,28 @@ const Region: React.FC = () => {
   const [nuevaRegion, setNuevaRegion] = useState<Region>({ region_nombre: '' });
   const [editando, setEditando] = useState<string | null>(null);
   const [busquedaId, setBusquedaId] = useState('');
+  const { id } = useParams();
   const navigate = useNavigate();
 
-  const apiRequest = async (method: 'post' | 'put' | 'get', endpoint: string, body?: any) => {
-    const url = `${PRIMARY_API}${endpoint}`;
-    const fallbackUrl = `${FALLBACK_API}${endpoint}`;
+  const apiRequest = async (method: 'get' | 'post' | 'put', endpoint: string, body?: any) => {
     try {
-      return await axios({ method, url, data: body });
+      return await axios({ method, url: `${PRIMARY_API}${endpoint}`, data: body });
     } catch {
-      return await axios({ method, url: fallbackUrl, data: body });
+      return await axios({ method, url: `${FALLBACK_API}${endpoint}`, data: body });
     }
   };
+
+  useEffect(() => {
+    if (id) {
+      apiRequest('get', `/get/region/${id}`)
+        .then(res => {
+          const r = res.data;
+          setNuevaRegion({ region_nombre: r.region_nombre });
+          setEditando(r.region_key || r.region_id);
+        })
+        .catch(err => console.error('Región no encontrada:', err));
+    }
+  }, [id]);
 
   const manejarCambio = (e: ChangeEvent<HTMLInputElement>) => {
     setNuevaRegion({ ...nuevaRegion, [e.target.name]: e.target.value });
@@ -35,24 +46,16 @@ const Region: React.FC = () => {
     if (!nuevaRegion.region_nombre) return;
 
     apiRequest('post', '/post/region', nuevaRegion)
-      .then(() => {
-        setNuevaRegion({ region_nombre: '' });
-      })
-      .catch(err => {
-        console.error('Error al crear la región:', err);
-      });
+      .then(() => setNuevaRegion({ region_nombre: '' }))
+      .catch(err => console.error('Error al crear la región:', err));
   };
 
   const actualizarRegion = () => {
     if (!editando) return;
 
     apiRequest('put', `/put/region/${editando}`, { region_nombre: nuevaRegion.region_nombre })
-      .then(() => {
-        cancelarEdicion();
-      })
-      .catch(err => {
-        console.error('Error al actualizar la región:', err);
-      });
+      .then(() => cancelarEdicion())
+      .catch(err => console.error('Error al actualizar la región:', err));
   };
 
   const buscarRegionPorId = () => {
@@ -61,16 +64,10 @@ const Region: React.FC = () => {
     apiRequest('get', `/get/region/${busquedaId}`)
       .then(res => {
         const r = res.data;
-        console.log(`Región encontrada: ${r.nombre}`);
+        setNuevaRegion({ region_nombre: r.region_nombre });
+        setEditando(r.region_key || r.region_id);
       })
-      .catch(err => {
-        console.error('Región no encontrada:', err);
-      });
-  };
-
-  const iniciarEdicion = (region: Region) => {
-    setEditando(region.region_key || null);
-    setNuevaRegion({ region_nombre: region.region_nombre });
+      .catch(err => console.error('Región no encontrada:', err));
   };
 
   const cancelarEdicion = () => {
@@ -82,7 +79,6 @@ const Region: React.FC = () => {
     <div className="region-container">
       <h2>Gestión de Regiones</h2>
 
-      {/* Buscar por ID */}
       <div className="form-busqueda">
         <input
           type="text"
@@ -93,7 +89,6 @@ const Region: React.FC = () => {
         <button onClick={buscarRegionPorId}>Buscar</button>
       </div>
 
-      {/* Formulario */}
       <div className="formulario">
         <input
           type="text"
@@ -112,7 +107,6 @@ const Region: React.FC = () => {
         )}
       </div>
 
-      {/* Redirección al listado */}
       <div className="mostrar-listado">
         <button onClick={() => navigate('/lista-regiones')}>Ir al listado de regiones</button>
       </div>

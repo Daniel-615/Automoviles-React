@@ -46,7 +46,12 @@ const ListaRegiones: React.FC = () => {
       ) : (
         <div className="tarjetas-vendedores">
           {regiones.map((r) => (
-            <div className="tarjeta" key={r.region_key}>
+            <div
+              className="tarjeta"
+              key={r.region_key}
+              onClick={() => navigate(`/region/${r.region_key}`)}
+              style={{ cursor: 'pointer' }}
+            >
               <h3>{r.region_nombre}</h3>
               <p><strong>UUID:</strong> {r.region_key}</p>
             </div>

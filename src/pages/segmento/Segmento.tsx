@@ -1,6 +1,6 @@
-import React, { useState, ChangeEvent } from 'react';
+import React, { useState, ChangeEvent, useEffect } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import '../../components/css/segmento.css';
 
 const PRIMARY_URL = 'https://autos-flask-umg-backend-ajbqcxhaaudjbdf0.mexicocentral-01.azurewebsites.net/ventas';
@@ -9,8 +9,7 @@ const FALLBACK_URL = 'http://127.0.0.1:5000/ventas';
 const hacerPeticion = async (config: any) => {
   try {
     return await axios({ ...config, url: config.url.replace('{BASE_URL}', PRIMARY_URL) });
-  } catch (error) {
-    console.warn('Fallo la URL principal. Usando fallback...');
+  } catch {
     return axios({ ...config, url: config.url.replace('{BASE_URL}', FALLBACK_URL) });
   }
 };
@@ -22,13 +21,23 @@ interface Segmento {
 }
 
 const Segmento: React.FC = () => {
-  const [nuevoSegmento, setNuevoSegmento] = useState<Omit<Segmento, 'segmento_key'>>({
-    segmento_id: '',
-    nombre: ''
-  });
+  const [nuevoSegmento, setNuevoSegmento] = useState<Omit<Segmento, 'segmento_key'>>({ segmento_id: '', nombre: '' });
   const [editando, setEditando] = useState<string | null>(null);
   const [busquedaId, setBusquedaId] = useState('');
   const navigate = useNavigate();
+  const { id } = useParams();
+
+  useEffect(() => {
+    if (id) {
+      hacerPeticion({ method: 'GET', url: `${PRIMARY_URL}/get/segmento/${id}` })
+        .then(res => {
+          const data = res.data;
+          setEditando(data.segmento_key);
+          setNuevoSegmento({ segmento_id: data.segmento_id, nombre: data.nombre });
+        })
+        .catch(err => console.error('Error al obtener segmento:', err));
+    }
+  }, [id]);
 
   const manejarCambio = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -36,63 +45,40 @@ const Segmento: React.FC = () => {
   };
 
   const crearSegmento = () => {
-    const { segmento_id, nombre } = nuevoSegmento;
-    if (!segmento_id || !nombre) return;
-
+    if (!nuevoSegmento.segmento_id || !nuevoSegmento.nombre) return;
     hacerPeticion({ method: 'POST', url: `${PRIMARY_URL}/post/segmento`, data: nuevoSegmento })
-      .then(() => {
-        setNuevoSegmento({ segmento_id: '', nombre: '' });
-      })
-      .catch(err => {
-        console.error('Error al crear segmento:', err);
-      });
+      .then(() => setNuevoSegmento({ segmento_id: '', nombre: '' }))
+      .catch(err => console.error('Error al crear segmento:', err));
   };
 
   const actualizarSegmento = () => {
     if (!editando) return;
-
     hacerPeticion({
       method: 'PUT',
       url: `${PRIMARY_URL}/put/segmento/${editando}`,
       data: { nombre: nuevoSegmento.nombre }
     })
-      .then(() => {
-        cancelarEdicion();
-      })
-      .catch(err => {
-        console.error('Error al actualizar segmento:', err);
-      });
+      .then(() => cancelarEdicion())
+      .catch(err => console.error('Error al actualizar segmento:', err));
   };
 
   const buscarSegmentoPorId = () => {
     if (!busquedaId) return;
-
     hacerPeticion({ method: 'GET', url: `${PRIMARY_URL}/get/segmento/${busquedaId}` })
-      .then(res => {
-        const s = res.data;
-        console.log(`Segmento encontrado: ID: ${s.segmento_id} - Nombre: ${s.nombre}`);
-      })
-      .catch(err => {
-        console.error('Segmento no encontrado:', err);
-      });
-  };
-
-  const iniciarEdicion = (segmento: Segmento) => {
-    if (!segmento.segmento_key) return;
-    setEditando(segmento.segmento_key);
-    setNuevoSegmento({ segmento_id: segmento.segmento_id, nombre: segmento.nombre });
+      .then(res => console.log('Segmento encontrado:', res.data))
+      .catch(err => console.error('Segmento no encontrado:', err));
   };
 
   const cancelarEdicion = () => {
     setEditando(null);
     setNuevoSegmento({ segmento_id: '', nombre: '' });
+    navigate('/lista-segmentos');
   };
 
   return (
     <div className="segmento-container">
       <h2>Gestión de Segmentos</h2>
 
-      {/* Buscar por ID */}
       <div className="form-busqueda">
         <input
           type="text"
@@ -103,7 +89,6 @@ const Segmento: React.FC = () => {
         <button onClick={buscarSegmentoPorId}>Buscar</button>
       </div>
 
-      {/* Formulario */}
       <div className="formulario">
         <input
           type="text"
@@ -130,7 +115,6 @@ const Segmento: React.FC = () => {
         )}
       </div>
 
-      {/* Botón para ver listado */}
       <div className="mostrar-listado">
         <button onClick={() => navigate('/lista-segmentos')}>Ir al listado de segmentos</button>
       </div>

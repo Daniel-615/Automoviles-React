@@ -1,9 +1,10 @@
-import React, { useState, ChangeEvent } from 'react';
+// ============================ Ciudades.tsx ============================
+import React, { useState, ChangeEvent, useEffect } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import '../../components/css/Ciudades.css';
 
-const PRIMARY_API = 'https://microservicio_ventas.serveo.net/ventas';
+const PRIMARY_API = 'https://autos-flask-umg-backend-ajbqcxhaaudjbdf0.mexicocentral-01.azurewebsites.net/ventas';
 const FALLBACK_API = 'http://127.0.0.1:5000/ventas';
 
 interface Ciudad {
@@ -19,9 +20,10 @@ const Ciudades: React.FC = () => {
     ciudad_key: '',
     region_key: ''
   });
-  const [editando, setEditando] = useState<Ciudad | null>(null);
+  const [editando, setEditando] = useState<boolean>(false);
   const [busquedaId, setBusquedaId] = useState('');
   const navigate = useNavigate();
+  const { id } = useParams<{ id: string }>();
 
   const apiRequest = async (method: 'get' | 'post' | 'put', endpoint: string, body?: any) => {
     try {
@@ -31,66 +33,78 @@ const Ciudades: React.FC = () => {
     }
   };
 
+  useEffect(() => {
+    if (id) {
+      apiRequest('get', `/get/ciudad/${id}`)
+        .then(res => {
+          const c = res.data;
+          setNuevaCiudad({
+            ciudad_nombre: c.ciudad_nombre || '',
+            ciudad_key: c.ciudad_key || c.ciudad_id,
+            region_key: c.region_key || ''
+          });
+          setEditando(true);
+        })
+        .catch(err => console.error('Error al obtener ciudad:', err));
+    } else {
+      setEditando(false);
+    }
+  }, [id]);
+
   const manejarCambio = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setNuevaCiudad({ ...nuevaCiudad, [name]: value });
+    setNuevaCiudad(prev => ({ ...prev, [name]: value }));
   };
 
   const crearCiudad = () => {
-    if (!nuevaCiudad.ciudad_nombre || !nuevaCiudad.ciudad_key || !nuevaCiudad.region_key) return;
+    const { ciudad_nombre, ciudad_key, region_key } = nuevaCiudad;
+    if (!ciudad_nombre || !ciudad_key || !region_key) return;
 
     const payload = {
-      ciudad_id: nuevaCiudad.ciudad_key,
-      ciudad_nombre: nuevaCiudad.ciudad_nombre,
-      region_key: nuevaCiudad.region_key
+      ciudad_id: ciudad_key,
+      ciudad_nombre,
+      region_key
     };
 
     apiRequest('post', '/post/ciudad', payload)
-      .then(() => {
-        setNuevaCiudad({ ciudad_nombre: '', ciudad_key: '', region_key: '' });
-      })
-      .catch(err => {
-        console.error('Error al crear ciudad:', err);
-      });
+      .then(() => setNuevaCiudad({ ciudad_nombre: '', ciudad_key: '', region_key: '' }))
+      .catch(err => console.error('Error al crear ciudad:', err));
   };
 
   const actualizarCiudad = () => {
-    if (!editando?.ciudad_key) return;
+    const { ciudad_nombre, ciudad_key, region_key } = nuevaCiudad;
+    if (!ciudad_key) return;
 
-    const payload = { ciudad_nombre: nuevaCiudad.ciudad_nombre };
+    const payload = { ciudad_nombre, region_key };
 
-    apiRequest('put', `/put/ciudad/${editando.ciudad_key}`, payload)
+    apiRequest('put', `/put/ciudad/${ciudad_key}`, payload)
       .then(() => {
-        cancelarEdicion();
+        setEditando(false);
+        navigate('/lista-ciudades');
       })
-      .catch(err => {
-        console.error('Error al actualizar ciudad:', err);
-      });
+      .catch(err => console.error('Error al actualizar ciudad:', err));
   };
 
-  const obtenerCiudadPorId = (id: string) => {
-    apiRequest('get', `/get/ciudad/${id}`)
+  const obtenerCiudadPorId = () => {
+    if (!busquedaId) return;
+
+    apiRequest('get', `/get/ciudad/${busquedaId}`)
       .then(res => {
         const c = res.data;
-        console.log('Ciudad encontrada:', c);
+        setNuevaCiudad({
+          ciudad_nombre: c.ciudad_nombre,
+          ciudad_key: c.ciudad_key || c.ciudad_id,
+          region_key: c.region_key || ''
+        });
+        setEditando(true);
       })
-      .catch(err => {
-        console.error('Ciudad no encontrada:', err);
-      });
-  };
-
-  const iniciarEdicion = (ciudad: Ciudad) => {
-    setEditando(ciudad);
-    setNuevaCiudad({
-      ciudad_nombre: ciudad.ciudad_nombre,
-      ciudad_key: ciudad.ciudad_key,
-      region_key: ciudad.region_key || ''
-    });
+      .catch(err => console.error('Ciudad no encontrada:', err));
   };
 
   const cancelarEdicion = () => {
-    setEditando(null);
+    setEditando(false);
     setNuevaCiudad({ ciudad_nombre: '', ciudad_key: '', region_key: '' });
+    navigate('/lista-ciudades');
   };
 
   return (
@@ -104,7 +118,7 @@ const Ciudades: React.FC = () => {
           value={busquedaId}
           onChange={(e) => setBusquedaId(e.target.value)}
         />
-        <button onClick={() => obtenerCiudadPorId(busquedaId)}>Buscar</button>
+        <button onClick={obtenerCiudadPorId}>Buscar</button>
       </div>
 
       <div className="formulario">
@@ -119,16 +133,16 @@ const Ciudades: React.FC = () => {
           placeholder="UUID ciudad"
           value={nuevaCiudad.ciudad_key}
           onChange={manejarCambio}
-          disabled={!!editando}
+          readOnly={editando}
         />
-        {!editando && (
-          <input
-            name="region_key"
-            placeholder="UUID región"
-            value={nuevaCiudad.region_key}
-            onChange={manejarCambio}
-          />
-        )}
+        <input
+          name="region_key"
+          placeholder="UUID región"
+          value={nuevaCiudad.region_key}
+          onChange={manejarCambio}
+          readOnly={editando}
+        />
+
         {editando ? (
           <>
             <button onClick={actualizarCiudad}>Actualizar</button>

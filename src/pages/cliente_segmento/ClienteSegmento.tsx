@@ -1,7 +1,7 @@
 // ============================ ClienteSegmento.tsx ============================
 import React, { useEffect, useState, ChangeEvent } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import '../../components/css/cliente_segmento.css';
 
 const PRIMARY_API = 'https://autos-flask-umg-backend-ajbqcxhaaudjbdf0.mexicocentral-01.azurewebsites.net/ventas';
@@ -14,13 +14,12 @@ interface ClienteSegmento {
 }
 
 const ClienteSegmento: React.FC = () => {
-  const [relaciones, setRelaciones] = useState<ClienteSegmento[]>([]);
   const [nuevaRelacion, setNuevaRelacion] = useState<Omit<ClienteSegmento, 'cliente_segmento_key'>>({
-    cliente_key: '',
-    segmento_key: ''
+    cliente_key: '', segmento_key: ''
   });
   const [editando, setEditando] = useState<ClienteSegmento | null>(null);
   const [busquedaId, setBusquedaId] = useState('');
+  const { id } = useParams();
   const navigate = useNavigate();
 
   const apiRequest = async (method: 'get' | 'post' | 'put', endpoint: string, body?: any) => {
@@ -31,15 +30,20 @@ const ClienteSegmento: React.FC = () => {
     }
   };
 
-  const obtenerRelaciones = () => {
-    apiRequest('get', '/get/cliente_segmento')
-      .then(res => setRelaciones(res.data.clientes_segmento || []))
-      .catch(console.error);
-  };
-
   useEffect(() => {
-    obtenerRelaciones();
-  }, []);
+    if (id) {
+      apiRequest('get', `/get/cliente_segmento/${id}`)
+        .then(res => {
+          const rel = res.data;
+          setNuevaRelacion({
+            cliente_key: rel.cliente_key,
+            segmento_key: rel.segmento_key
+          });
+          setEditando(rel);
+        })
+        .catch(console.error);
+    }
+  }, [id]);
 
   const manejarCambio = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -51,7 +55,6 @@ const ClienteSegmento: React.FC = () => {
 
     apiRequest('post', '/post/cliente_segmento', nuevaRelacion)
       .then(() => {
-        obtenerRelaciones();
         setNuevaRelacion({ cliente_key: '', segmento_key: '' });
       })
       .catch(console.error);
@@ -63,10 +66,7 @@ const ClienteSegmento: React.FC = () => {
     apiRequest('put', `/put/cliente_segmento/${editando.cliente_segmento_key}`, {
       segmento_key: nuevaRelacion.segmento_key
     })
-      .then(() => {
-        obtenerRelaciones();
-        cancelarEdicion();
-      })
+      .then(() => cancelarEdicion())
       .catch(console.error);
   };
 
@@ -74,18 +74,18 @@ const ClienteSegmento: React.FC = () => {
     if (!busquedaId) return;
 
     apiRequest('get', `/get/cliente_segmento/${busquedaId}`)
-      .then(res => console.log(res.data))
+      .then(res => {
+        const rel = res.data;
+        setNuevaRelacion({ cliente_key: rel.cliente_key, segmento_key: rel.segmento_key });
+        setEditando(rel);
+      })
       .catch(console.error);
-  };
-
-  const iniciarEdicion = (rel: ClienteSegmento) => {
-    setEditando(rel);
-    setNuevaRelacion({ cliente_key: rel.cliente_key, segmento_key: rel.segmento_key });
   };
 
   const cancelarEdicion = () => {
     setEditando(null);
     setNuevaRelacion({ cliente_key: '', segmento_key: '' });
+    navigate('/lista-cliente-segmento');
   };
 
   return (

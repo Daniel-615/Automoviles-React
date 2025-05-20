@@ -10,7 +10,7 @@ interface Ciudad {
   region_key?: string;
 }
 
-const PRIMARY_API = 'https://microservicio_ventas.serveo.net/ventas';
+const PRIMARY_API = 'https://autos-flask-umg-backend-ajbqcxhaaudjbdf0.mexicocentral-01.azurewebsites.net/ventas';
 const FALLBACK_API = 'http://127.0.0.1:5000/ventas';
 
 const fetchWithFallback = async (endpoint: string) => {
@@ -54,7 +54,12 @@ const ListaCiudades: React.FC = () => {
       ) : (
         <div className="tarjetas-vendedores">
           {ciudades.map((c) => (
-            <div className="tarjeta" key={c.ciudad_key}>
+            <div
+              className="tarjeta"
+              key={c.ciudad_key}
+              onClick={() => navigate(`/ciudades/${c.ciudad_key}`)}
+              style={{ cursor: 'pointer' }}
+            >
               <h3>{c.ciudad_nombre}</h3>
               <p><strong>ID:</strong> {c.ciudad_id}</p>
               <p><strong>Región:</strong> {c.region_key || 'N/A'}</p>
