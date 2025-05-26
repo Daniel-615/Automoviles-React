@@ -22,6 +22,7 @@ const Navbar = () => {
         <ul className={`nav-links ${menuAbierto ? 'abierto' : ''}`}>
           <li><Link to="/">Inicio</Link></li>
 
+          {/* Catálogos generales */}
           <li
             className={`dropdown ${dropdownActivo === 'catalogos' ? 'activo' : ''}`}
             onClick={() => toggleDropdown('catalogos')}
@@ -37,6 +38,7 @@ const Navbar = () => {
             </ul>
           </li>
 
+          {/* Relaciones */}
           <li
             className={`dropdown ${dropdownActivo === 'relaciones' ? 'activo' : ''}`}
             onClick={() => toggleDropdown('relaciones')}
@@ -46,6 +48,33 @@ const Navbar = () => {
               <li><Link to="/cliente-segmento">Cliente-Segmento</Link></li>
               <li><Link to="/vendedor">Vendedores</Link></li>
               <li><Link to="/vendedor_tienda">Vendedor-Tienda</Link></li>
+            </ul>
+          </li>
+
+          {/* Catálogos de ventas */}
+          <li
+            className={`dropdown ${dropdownActivo === 'ventasCatalogos' ? 'activo' : ''}`}
+            onClick={() => toggleDropdown('ventasCatalogos')}
+          >
+            <span className="dropdown-toggle">Catálogos Ventas</span>
+            <ul className="dropdown-menu">
+              <li><Link to="/categoria">Categorías</Link></li>
+              <li><Link to="/marca">Marcas</Link></li>
+              <li><Link to="/modelo">Modelos</Link></li>
+              <li><Link to="/producto">Productos</Link></li>
+              <li><Link to="/fecha">Fechas</Link></li>
+            </ul>
+          </li>
+
+          {/* Módulo de ventas */}
+          <li
+            className={`dropdown ${dropdownActivo === 'ventas' ? 'activo' : ''}`}
+            onClick={() => toggleDropdown('ventas')}
+          >
+            <span className="dropdown-toggle">Ventas</span>
+            <ul className="dropdown-menu">
+              <li><Link to="/ventas">Registrar Venta</Link></li>
+              <li><Link to="/lista-ventas">Ver Ventas</Link></li>
             </ul>
           </li>
         </ul>
