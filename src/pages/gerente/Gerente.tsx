@@ -1,115 +1,168 @@
-import React, { useEffect, useState, ChangeEvent } from 'react';
-import '../../components/css/Gerente.css';
-import axios from 'axios';
+"use client"
 
-const PRIMARY_API = 'https://autos-flask-umg-backend-ajbqcxhaaudjbdf0.mexicocentral-01.azurewebsites.net/ventas';
-const FALLBACK_API = 'http://localhost:5000/ventas';
+import type React from "react"
+import { useEffect, useState, type ChangeEvent } from "react"
+import axios from "axios"
+import { useNavigate, useParams } from "react-router-dom"
+import "../../components/css/Gerente.css"
+
+const PRIMARY_API = "https://autos-flask-umg-backend-ajbqcxhaaudjbdf0.mexicocentral-01.azurewebsites.net/ventas"
+const FALLBACK_API = "http://localhost:5000/ventas"
 
 interface Gerente {
-  gerente_key: string;
-  gerente_id: string;
-  nombre: string;
+  gerente_key: string
+  gerente_id: string
+  nombre: string
 }
 
 const Gerentes: React.FC = () => {
-  const [gerentes, setGerentes] = useState<Gerente[]>([]);
-  const [nuevoGerente, setNuevoGerente] = useState<Omit<Gerente, 'gerente_id'>>({
-    nombre: '',
-    gerente_key: ''
-  });
-  const [editando, setEditando] = useState<Gerente | null>(null);
-  const [busqueda, setBusqueda] = useState('');
+  const [nuevoGerente, setNuevoGerente] = useState({
+    gerente_id: "",
+    gerente_nombre: "",
+  })
+  const [editando, setEditando] = useState<Gerente | null>(null)
+  const [busqueda, setBusqueda] = useState("")
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState("")
+  const navigate = useNavigate()
+  const { id } = useParams<{ id: string }>()
 
-  const apiRequest = async (method: 'get' | 'post' | 'put', endpoint: string, body?: any) => {
+  const apiRequest = async (method: "get" | "post" | "put", endpoint: string, body?: any) => {
     try {
-      return await axios({ method, url: `${PRIMARY_API}${endpoint}`, data: body });
+      return await axios({ method, url: `${PRIMARY_API}${endpoint}`, data: body })
     } catch {
-      return await axios({ method, url: `${FALLBACK_API}${endpoint}`, data: body });
+      return await axios({ method, url: `${FALLBACK_API}${endpoint}`, data: body })
     }
-  };
-
-  const obtenerGerentes = () => {
-    apiRequest('get', '/get/gerente')
-      .then(res => {
-        const datos = res.data.gerentes || [];
-        const formateados = datos.map((g: any): Gerente => ({
-          gerente_key: g.gerente_key || g.gerente_id || '',
-          gerente_id: g.gerente_id || g.gerente_key || '',
-          nombre: g.nombre
-        }));
-        setGerentes(formateados);
-      })
-      .catch(err => {
-        console.error('No se pudieron cargar los gerentes:', err);
-      });
-  };
+  }
 
   useEffect(() => {
-    obtenerGerentes();
-  }, []);
+    if (id) {
+      cargarGerenteParaEdicion(id)
+    }
+  }, [id])
+
+  const cargarGerenteParaEdicion = async (gerenteId: string) => {
+    try {
+      setLoading(true)
+      const res = await apiRequest("get", `/get/gerente/${gerenteId}`)
+      const g = res.data
+      setNuevoGerente({
+        gerente_id: g.gerente_id || g.gerente_key || "",
+        gerente_nombre: g.nombre || "",
+      })
+      setEditando(g)
+    } catch (err: any) {
+      console.error("Error al cargar gerente:", err)
+      setError(err.response?.data?.message || "Error al cargar el gerente")
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const manejarCambio = (e: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setNuevoGerente(prev => ({ ...prev, [name]: value }));
-  };
+    const { name, value } = e.target
+    setNuevoGerente((prev) => ({ ...prev, [name]: value }))
+    setError("")
+  }
 
-  const crearGerente = () => {
-    const { nombre, gerente_key } = nuevoGerente;
-    if (!nombre || !gerente_key) return;
+  const validarFormulario = () => {
+    if (!nuevoGerente.gerente_id.trim()) {
+      setError("El ID del gerente es requerido")
+      return false
+    }
+    if (!nuevoGerente.gerente_nombre.trim()) {
+      setError("El nombre del gerente es requerido")
+      return false
+    }
+    return true
+  }
 
-    const payload = { gerente_id: gerente_key, gerente_nombre: nombre };
+  const crearGerente = async () => {
+    if (!validarFormulario()) return
 
-    apiRequest('post', '/post/gerente', payload)
-      .then(() => {
-        obtenerGerentes();
-        setNuevoGerente({ nombre: '', gerente_key: '' });
+    try {
+      setLoading(true)
+      await apiRequest("post", "/post/gerente", nuevoGerente)
+      setNuevoGerente({ gerente_id: "", gerente_nombre: "" })
+      setError("")
+      alert("Gerente creado exitosamente")
+    } catch (err: any) {
+      console.error("Error al crear gerente:", err)
+      setError(err.response?.data?.message || "Error al crear el gerente")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const actualizarGerente = async () => {
+    if (!editando?.gerente_key) return
+    if (!nuevoGerente.gerente_nombre.trim()) {
+      setError("El nombre del gerente es requerido")
+      return
+    }
+
+    try {
+      setLoading(true)
+      await apiRequest("put", `/put/gerente/${editando.gerente_key}`, {
+        gerente_nombre: nuevoGerente.gerente_nombre,
       })
-      .catch(err => {
-        console.error('Error al crear gerente:', err);
-      });
-  };
+      alert("Gerente actualizado exitosamente")
+      cancelarEdicion()
+    } catch (err: any) {
+      console.error("Error al actualizar gerente:", err)
+      setError(err.response?.data?.message || "Error al actualizar el gerente")
+    } finally {
+      setLoading(false)
+    }
+  }
 
-  const actualizarGerente = () => {
-    if (!editando?.gerente_key) return;
+  const buscarGerentePorId = async () => {
+    if (!busqueda.trim()) {
+      setError("Ingrese un ID para buscar")
+      return
+    }
 
-    apiRequest('put', `/put/gerente/${editando.gerente_key}`, {
-      gerente_nombre: nuevoGerente.nombre
-    })
-      .then(() => {
-        obtenerGerentes();
-        cancelarEdicion();
-      })
-      .catch(err => {
-        console.error('Error al actualizar gerente:', err);
-      });
-  };
-
-  const buscarGerente = () => {
-    if (!busqueda) return;
-
-    apiRequest('get', `/get/gerente/${busqueda}`)
-      .then(res => {
-        const g = res.data;
-        console.log(`Gerente encontrado: ${g.nombre} (${g.gerente_id || g.gerente_key})`);
-      })
-      .catch(err => {
-        console.error('Gerente no encontrado:', err);
-      });
-  };
-
-  const iniciarEdicion = (gerente: Gerente) => {
-    setEditando(gerente);
-    setNuevoGerente({ nombre: gerente.nombre, gerente_key: gerente.gerente_key });
-  };
+    try {
+      setLoading(true)
+      await cargarGerenteParaEdicion(busqueda)
+      setBusqueda("")
+    } catch (err) {
+      // El error ya se maneja en cargarGerenteParaEdicion
+    }
+  }
 
   const cancelarEdicion = () => {
-    setEditando(null);
-    setNuevoGerente({ nombre: '', gerente_key: '' });
-  };
+    setEditando(null)
+    setNuevoGerente({ gerente_id: "", gerente_nombre: "" })
+    setError("")
+    navigate("/lista-gerentes")
+  }
+
+  if (loading && !editando) {
+    return (
+      <div className="ciudad-container">
+        <h2>Cargando...</h2>
+      </div>
+    )
+  }
 
   return (
     <div className="ciudad-container">
       <h2>Gestión de Gerentes</h2>
+
+      {error && (
+        <div
+          style={{
+            backgroundColor: "#ffebee",
+            color: "#c62828",
+            padding: "1rem",
+            borderRadius: "8px",
+            marginBottom: "1rem",
+          }}
+        >
+          {error}
+        </div>
+      )}
 
       <div className="form-busqueda">
         <input
@@ -118,48 +171,49 @@ const Gerentes: React.FC = () => {
           value={busqueda}
           onChange={(e) => setBusqueda(e.target.value)}
         />
-        <button onClick={buscarGerente}>Buscar</button>
+        <button onClick={buscarGerentePorId} disabled={loading}>
+          Buscar
+        </button>
       </div>
 
       <div className="formulario">
         <input
           type="text"
-          name="nombre"
-          placeholder="Nombre"
-          value={nuevoGerente.nombre}
+          name="gerente_id"
+          placeholder="ID del Gerente"
+          value={nuevoGerente.gerente_id}
           onChange={manejarCambio}
+          disabled={!!editando || loading}
         />
         <input
           type="text"
-          name="gerente_key"
-          placeholder="UUID"
-          value={nuevoGerente.gerente_key}
+          name="gerente_nombre"
+          placeholder="Nombre del Gerente"
+          value={nuevoGerente.gerente_nombre}
           onChange={manejarCambio}
-          disabled={!!editando}
+          disabled={loading}
         />
         {editando ? (
           <>
-            <button onClick={actualizarGerente}>Actualizar</button>
-            <button onClick={cancelarEdicion} className="btn-cancelar">Cancelar</button>
+            <button onClick={actualizarGerente} disabled={loading}>
+              {loading ? "Actualizando..." : "Actualizar"}
+            </button>
+            <button onClick={cancelarEdicion} className="btn-cancelar" disabled={loading}>
+              Cancelar
+            </button>
           </>
         ) : (
-          <button onClick={crearGerente}>Crear</button>
+          <button onClick={crearGerente} disabled={loading}>
+            {loading ? "Creando..." : "Crear"}
+          </button>
         )}
       </div>
 
-      <ul className="lista-ciudades">
-        {gerentes.map((g) => (
-          <li key={g.gerente_key}>
-            <strong>{g.nombre}</strong> - {g.gerente_id}
-            <div>
-              <button onClick={() => iniciarEdicion(g)}>Editar</button>
-              <button onClick={buscarGerente} className="btn-ver">Ver</button>
-            </div>
-          </li>
-        ))}
-      </ul>
+      <div className="mostrar-listado">
+        <button onClick={() => navigate("/lista-gerentes")}>Ir al listado de gerentes</button>
+      </div>
     </div>
-  );
-};
+  )
+}
 
-export default Gerentes;
+export default Gerentes

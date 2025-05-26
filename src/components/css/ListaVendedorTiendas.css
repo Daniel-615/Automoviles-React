@@ -1,4 +1,4 @@
-/* CONTENEDOR GENERAL */
+/* CONTENEDOR PRINCIPAL */
 .lista-container {
   max-width: 1200px;
   margin: 3rem auto;
@@ -140,64 +140,29 @@
   min-width: 80px;
 }
 
-/* INFORMACIÓN DE PAGINACIÓN */
-.info-paginacion {
-  margin-bottom: 1.5rem;
-  color: #64748b;
-  font-size: 0.95rem;
-  text-align: center;
-  padding: 1rem;
-  background: rgba(21, 101, 192, 0.02);
-  border-radius: 8px;
-  border: 1px solid rgba(21, 101, 192, 0.1);
-}
-
-/* CONTROLES DE PAGINACIÓN */
-.controles-paginacion {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 1rem;
-  margin-top: 2.5rem;
-  flex-wrap: wrap;
-}
-
-.controles-paginacion button {
-  background: linear-gradient(135deg, #1565c0 0%, #1976d2 100%);
-  color: white;
-  border: none;
-  padding: 0.8rem 1.5rem;
-  border-radius: 10px;
+/* ESTADO ACTIVO/INACTIVO */
+.tarjeta .estado-activo {
+  background: rgba(76, 175, 80, 0.1);
+  color: #2e7d32;
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
   font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(21, 101, 192, 0.3);
-  min-width: 120px;
+  display: inline-block;
+  margin: 0.5rem 0;
+  border: 1px solid rgba(76, 175, 80, 0.3);
 }
 
-.controles-paginacion button:hover:not(:disabled) {
-  background: linear-gradient(135deg, #0d47a1 0%, #1565c0 100%);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(21, 101, 192, 0.4);
-}
-
-.controles-paginacion button:disabled {
-  background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
-  color: #94a3b8;
-  cursor: not-allowed;
-  box-shadow: none;
-  transform: none;
-}
-
-.indicador-pagina {
-  padding: 0.8rem 1.5rem;
-  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
+.tarjeta .estado-inactivo {
+  background: rgba(244, 67, 54, 0.1);
+  color: #c62828;
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
   font-weight: 600;
-  color: #475569;
-  border: 1px solid rgba(21, 101, 192, 0.1);
+  display: inline-block;
+  margin: 0.5rem 0;
+  border: 1px solid rgba(244, 67, 54, 0.3);
 }
 
 /* RESPONSIVE */
@@ -226,16 +191,6 @@
     grid-template-columns: 1fr;
     gap: 1.5rem;
   }
-
-  .controles-paginacion {
-    flex-direction: column;
-    gap: 0.8rem;
-  }
-
-  .controles-paginacion button {
-    width: 100%;
-    max-width: 200px;
-  }
 }
 
 @media (max-width: 480px) {
@@ -258,5 +213,9 @@
 
   .tarjeta p {
     font-size: 0.9rem;
+  }
+
+  .tarjeta p strong {
+    min-width: 70px;
   }
 }

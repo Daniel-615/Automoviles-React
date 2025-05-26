@@ -1,6 +1,6 @@
-/* CONTENEDOR GENERAL */
+/* CONTENEDOR PRINCIPAL */
 .lista-container {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 3rem auto;
   padding: 2.5rem 2rem;
   background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
@@ -77,7 +77,7 @@
 /* CONTENEDOR DE TARJETAS */
 .tarjetas-vendedores {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
   gap: 2rem;
   margin-top: 1rem;
 }
@@ -85,7 +85,7 @@
 /* TARJETAS INDIVIDUALES */
 .tarjeta {
   background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-  padding: 1.8rem 1.5rem;
+  padding: 2rem 1.8rem;
   border-radius: 12px;
   border: 1px solid rgba(21, 101, 192, 0.1);
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
@@ -118,16 +118,16 @@
 }
 
 .tarjeta h3 {
-  margin-bottom: 1rem;
+  margin-bottom: 1.2rem;
   color: #1565c0;
-  font-size: 1.3rem;
+  font-size: 1.4rem;
   font-weight: 600;
   border-bottom: 1px solid rgba(21, 101, 192, 0.1);
-  padding-bottom: 0.5rem;
+  padding-bottom: 0.8rem;
 }
 
 .tarjeta p {
-  margin: 0.6rem 0;
+  margin: 0.8rem 0;
   color: #475569;
   font-size: 0.95rem;
   line-height: 1.5;
@@ -140,64 +140,24 @@
   min-width: 80px;
 }
 
-/* INFORMACIÓN DE PAGINACIÓN */
-.info-paginacion {
-  margin-bottom: 1.5rem;
-  color: #64748b;
-  font-size: 0.95rem;
-  text-align: center;
-  padding: 1rem;
-  background: rgba(21, 101, 192, 0.02);
+/* INFORMACIÓN ESPECIAL PARA TIENDAS */
+.tarjeta .info-horario {
+  background: rgba(21, 101, 192, 0.05);
+  padding: 0.8rem;
   border-radius: 8px;
-  border: 1px solid rgba(21, 101, 192, 0.1);
+  margin: 1rem 0;
+  border-left: 4px solid #1565c0;
 }
 
-/* CONTROLES DE PAGINACIÓN */
-.controles-paginacion {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 1rem;
-  margin-top: 2.5rem;
-  flex-wrap: wrap;
-}
-
-.controles-paginacion button {
-  background: linear-gradient(135deg, #1565c0 0%, #1976d2 100%);
-  color: white;
-  border: none;
-  padding: 0.8rem 1.5rem;
-  border-radius: 10px;
+.tarjeta .info-tamaño {
+  background: rgba(76, 175, 80, 0.05);
+  padding: 0.5rem 0.8rem;
+  border-radius: 6px;
+  display: inline-block;
+  margin: 0.5rem 0;
+  border: 1px solid rgba(76, 175, 80, 0.2);
+  color: #2e7d32;
   font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(21, 101, 192, 0.3);
-  min-width: 120px;
-}
-
-.controles-paginacion button:hover:not(:disabled) {
-  background: linear-gradient(135deg, #0d47a1 0%, #1565c0 100%);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(21, 101, 192, 0.4);
-}
-
-.controles-paginacion button:disabled {
-  background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
-  color: #94a3b8;
-  cursor: not-allowed;
-  box-shadow: none;
-  transform: none;
-}
-
-.indicador-pagina {
-  padding: 0.8rem 1.5rem;
-  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  font-weight: 600;
-  color: #475569;
-  border: 1px solid rgba(21, 101, 192, 0.1);
 }
 
 /* RESPONSIVE */
@@ -226,16 +186,6 @@
     grid-template-columns: 1fr;
     gap: 1.5rem;
   }
-
-  .controles-paginacion {
-    flex-direction: column;
-    gap: 0.8rem;
-  }
-
-  .controles-paginacion button {
-    width: 100%;
-    max-width: 200px;
-  }
 }
 
 @media (max-width: 480px) {
@@ -258,5 +208,9 @@
 
   .tarjeta p {
     font-size: 0.9rem;
+  }
+
+  .tarjeta p strong {
+    min-width: 70px;
   }
 }

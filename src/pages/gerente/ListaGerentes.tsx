@@ -4,11 +4,12 @@ import type React from "react"
 import { useEffect, useState } from "react"
 import axios from "axios"
 import { useNavigate } from "react-router-dom"
-import "../../components/css/ListaRegiones.css"
+import "../../components/css/ListaGerentes.css"
 
-interface Region {
-  region_key: string
-  region_nombre: string
+interface Gerente {
+  gerente_key: string
+  gerente_id: string
+  nombre: string
 }
 
 const PRIMARY_API = "https://autos-flask-umg-backend-ajbqcxhaaudjbdf0.mexicocentral-01.azurewebsites.net/ventas"
@@ -22,27 +23,35 @@ const fetchWithFallback = async (endpoint: string) => {
   }
 }
 
-const ListaRegiones: React.FC = () => {
-  const [regiones, setRegiones] = useState<Region[]>([])
+const ListaGerentes: React.FC = () => {
+  const [gerentes, setGerentes] = useState<Gerente[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
   const navigate = useNavigate()
 
   useEffect(() => {
-    cargarRegiones()
+    cargarGerentes()
   }, [])
 
-  const cargarRegiones = async () => {
+  const cargarGerentes = async () => {
     try {
       setLoading(true)
-      const res = await fetchWithFallback("/get/region")
-      const datos = res.data.regiones || res.data
-      const formateadas = datos.filter((r: Region) => r.region_key && r.region_nombre)
-      setRegiones(formateadas)
+      const res = await fetchWithFallback("/get/gerente")
+      const datos = res.data.gerentes || res.data
+      const formateados = datos
+        .map(
+          (g: any): Gerente => ({
+            gerente_key: g.gerente_key || g.gerente_id || "",
+            gerente_id: g.gerente_id || g.gerente_key || "",
+            nombre: g.nombre,
+          }),
+        )
+        .filter((g: Gerente) => g.gerente_key && g.nombre)
+      setGerentes(formateados)
       setError("")
     } catch (err: any) {
-      console.error("Error al obtener regiones:", err)
-      setError("Error al cargar las regiones")
+      console.error("Error al obtener gerentes:", err)
+      setError("Error al cargar los gerentes")
     } finally {
       setLoading(false)
     }
@@ -51,7 +60,7 @@ const ListaRegiones: React.FC = () => {
   if (loading) {
     return (
       <div className="lista-container">
-        <h1>Cargando regiones...</h1>
+        <h1>Cargando gerentes...</h1>
       </div>
     )
   }
@@ -59,8 +68,8 @@ const ListaRegiones: React.FC = () => {
   return (
     <div className="lista-container">
       <div className="lista-header">
-        <h1>Listado de Regiones</h1>
-        <button className="btn-volver" onClick={() => navigate("/region")}>
+        <h1>Listado de Gerentes</h1>
+        <button className="btn-volver" onClick={() => navigate("/gerentes")}>
           ← Volver a Gestión
         </button>
       </div>
@@ -79,23 +88,26 @@ const ListaRegiones: React.FC = () => {
         </div>
       )}
 
-      {regiones.length === 0 ? (
-        <p className="mensaje-vacio">No hay regiones registradas.</p>
+      {gerentes.length === 0 ? (
+        <p className="mensaje-vacio">No hay gerentes registrados.</p>
       ) : (
         <>
-          <div style={{ marginBottom: "1rem", color: "#666" }}>Total de regiones: {regiones.length}</div>
+          <div style={{ marginBottom: "1rem", color: "#666" }}>Total de gerentes: {gerentes.length}</div>
 
           <div className="tarjetas-vendedores">
-            {regiones.map((r) => (
+            {gerentes.map((g) => (
               <div
                 className="tarjeta"
-                key={r.region_key}
-                onClick={() => navigate(`/region/${r.region_key}`)}
+                key={g.gerente_key}
+                onClick={() => navigate(`/gerentes/${g.gerente_key}`)}
                 style={{ cursor: "pointer" }}
               >
-                <h3>{r.region_nombre}</h3>
+                <h3>{g.nombre}</h3>
                 <p>
-                  <strong>UUID:</strong> {r.region_key}
+                  <strong>ID:</strong> {g.gerente_id}
+                </p>
+                <p>
+                  <strong>UUID:</strong> {g.gerente_key}
                 </p>
               </div>
             ))}
@@ -106,4 +118,4 @@ const ListaRegiones: React.FC = () => {
   )
 }
 
-export default ListaRegiones
+export default ListaGerentes

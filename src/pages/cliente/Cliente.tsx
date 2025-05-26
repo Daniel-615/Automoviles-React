@@ -27,101 +27,211 @@ export interface Cliente {
 
 const Cliente: React.FC = () => {
   const navigate = useNavigate();
-  const { id } = useParams(); // Para edición desde URL
+  const { id } = useParams();
 
-  const [nuevoCliente, setNuevoCliente] = useState<Omit<Cliente, 'cliente_key' | 'fecha_registro'>>({
-    cliente_id: '', nombre: '', apellido: '', email: '', telefono: '', ciudad: ''
+  const [nuevoCliente, setNuevoCliente] = useState({
+    cliente_id: '',
+    cliente_nombre: '',
+    cliente_apellido: '',
+    cliente_gmail: '',
+    cliente_telefono: '',
+    ciudad_id: ''
   });
 
   const [editando, setEditando] = useState<Cliente | null>(null);
   const [busquedaId, setBusquedaId] = useState('');
   const [ciudades, setCiudades] = useState<{ ciudad_key: string; ciudad_nombre: string }[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    // Cargar ciudades para el combobox
-    axiosWithFallback('get', '/get/ciudad')
-      .then(res => {
-        const datos = res.data.ciudades || res.data;
-        setCiudades(datos);
-      })
-      .catch(err => console.error('Error al cargar ciudades:', err));
+    cargarCiudades();
   }, []);
 
   useEffect(() => {
     if (id) {
-      axiosWithFallback('get', `/get/cliente/${id}`)
-        .then(res => {
-          const c = res.data;
-          setNuevoCliente({
-            cliente_id: c.cliente_id,
-            nombre: c.nombre,
-            apellido: c.apellido,
-            email: c.email,
-            telefono: c.telefono,
-            ciudad: c.ciudad
-          });
-          setEditando(c);
-        })
-        .catch(err => console.error('Error al cargar cliente para edición:', err));
+      cargarClienteParaEdicion(id);
     }
   }, [id]);
 
-  const manejarCambio = (e: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement>) => {
+  const cargarCiudades = async () => {
+    try {
+      const res = await axiosWithFallback('get', '/get/ciudad');
+      const datos = res.data.ciudades || res.data;
+      setCiudades(datos);
+    } catch (err) {
+      console.error('Error al cargar ciudades:', err);
+      setError('Error al cargar las ciudades');
+    }
+  };
+
+  const cargarClienteParaEdicion = async (clienteId: string) => {
+    try {
+      setLoading(true);
+      const res = await axiosWithFallback('get', `/get/cliente/${clienteId}`);
+      const c = res.data;
+      setNuevoCliente({
+        cliente_id: c.cliente_id,
+        cliente_nombre: c.nombre,
+        cliente_apellido: c.apellido,
+        cliente_gmail: c.email,
+        cliente_telefono: c.telefono,
+        ciudad_id: c.ciudad
+      });
+      setEditando(c);
+    } catch (err: any) {
+      console.error('Error al cargar cliente:', err);
+      setError(err.response?.data?.message || 'Error al cargar el cliente');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const manejarCambio = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setNuevoCliente({ ...nuevoCliente, [name]: value });
+    setNuevoCliente(prev => ({ ...prev, [name]: value }));
+    setError('');
   };
 
-  const crearCliente = () => {
-    const { cliente_id, nombre, apellido, email, telefono, ciudad } = nuevoCliente;
-    if (!cliente_id || !nombre || !apellido || !email || !telefono || !ciudad) return;
+  const validarFormulario = () => {
+    const { cliente_id, cliente_nombre, cliente_apellido, cliente_gmail, cliente_telefono, ciudad_id } = nuevoCliente;
+    
+    if (!cliente_id.trim()) {
+      setError('El ID del cliente es requerido');
+      return false;
+    }
+    if (!cliente_nombre.trim()) {
+      setError('El nombre es requerido');
+      return false;
+    }
+    if (!cliente_apellido.trim()) {
+      setError('El apellido es requerido');
+      return false;
+    }
+    if (!cliente_gmail.trim()) {
+      setError('El email es requerido');
+      return false;
+    }
+    if (!cliente_telefono.trim()) {
+      setError('El teléfono es requerido');
+      return false;
+    }
+    if (!ciudad_id) {
+      setError('Debe seleccionar una ciudad');
+      return false;
+    }
 
-    axiosWithFallback('post', '/post/cliente', {
-      cliente_id, cliente_nombre: nombre, cliente_apellido: apellido,
-      cliente_gmail: email, cliente_telefono: telefono, ciudad_id: ciudad
-    }).then(() => cancelarEdicion())
-      .catch(err => console.error('Error al crear cliente:', err));
+    // Validar formato de email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(cliente_gmail)) {
+      setError('El formato del email no es válido');
+      return false;
+    }
+
+    return true;
   };
 
-  const actualizarCliente = () => {
+  const crearCliente = async () => {
+    if (!validarFormulario()) return;
+
+    try {
+      setLoading(true);
+      await axiosWithFallback('post', '/post/cliente', nuevoCliente);
+      setNuevoCliente({
+        cliente_id: '',
+        cliente_nombre: '',
+        cliente_apellido: '',
+        cliente_gmail: '',
+        cliente_telefono: '',
+        ciudad_id: ''
+      });
+      setError('');
+      alert('Cliente creado exitosamente');
+    } catch (err: any) {
+      console.error('Error al crear cliente:', err);
+      setError(err.response?.data?.message || 'Error al crear el cliente');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const actualizarCliente = async () => {
     if (!editando?.cliente_key) return;
+    if (!nuevoCliente.cliente_gmail || !nuevoCliente.cliente_telefono || !nuevoCliente.ciudad_id) {
+      setError('Todos los campos son requeridos para actualizar');
+      return;
+    }
 
-    axiosWithFallback('put', `/put/cliente/${editando.cliente_key}`, {
-      cliente_gmail: nuevoCliente.email,
-      cliente_telefono: nuevoCliente.telefono,
-      cliente_ciudad: nuevoCliente.ciudad,
-      cliente_region: ''
-    }).then(() => cancelarEdicion())
-      .catch(err => console.error('Error al actualizar cliente:', err));
+    try {
+      setLoading(true);
+      await axiosWithFallback('put', `/put/cliente/${editando.cliente_key}`, {
+        cliente_gmail: nuevoCliente.cliente_gmail,
+        cliente_telefono: nuevoCliente.cliente_telefono,
+        cliente_ciudad: nuevoCliente.ciudad_id,
+        cliente_region: '' // El backend requiere este campo
+      });
+      alert('Cliente actualizado exitosamente');
+      cancelarEdicion();
+    } catch (err: any) {
+      console.error('Error al actualizar cliente:', err);
+      setError(err.response?.data?.message || 'Error al actualizar el cliente');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const buscarClientePorId = () => {
-    if (!busquedaId) return;
+  const buscarClientePorId = async () => {
+    if (!busquedaId.trim()) {
+      setError('Ingrese un ID para buscar');
+      return;
+    }
 
-    axiosWithFallback('get', `/get/cliente/${busquedaId}`)
-      .then(res => {
-        const c = res.data;
-        setNuevoCliente({
-          cliente_id: c.cliente_id,
-          nombre: c.nombre,
-          apellido: c.apellido,
-          email: c.email,
-          telefono: c.telefono,
-          ciudad: c.ciudad
-        });
-        setEditando(c);
-      })
-      .catch(err => console.error('Cliente no encontrado:', err));
+    try {
+      setLoading(true);
+      await cargarClienteParaEdicion(busquedaId);
+      setBusquedaId('');
+    } catch (err) {
+      // El error ya se maneja en cargarClienteParaEdicion
+    }
   };
 
   const cancelarEdicion = () => {
     setEditando(null);
-    setNuevoCliente({ cliente_id: '', nombre: '', apellido: '', email: '', telefono: '', ciudad: '' });
+    setNuevoCliente({
+      cliente_id: '',
+      cliente_nombre: '',
+      cliente_apellido: '',
+      cliente_gmail: '',
+      cliente_telefono: '',
+      ciudad_id: ''
+    });
+    setError('');
     navigate('/clientes');
   };
+
+  if (loading) {
+    return (
+      <div className="cliente-container">
+        <h2>Cargando...</h2>
+      </div>
+    );
+  }
 
   return (
     <div className="cliente-container">
       <h2>Gestión de Clientes</h2>
+
+      {error && (
+        <div style={{ 
+          backgroundColor: '#ffebee', 
+          color: '#c62828', 
+          padding: '1rem', 
+          borderRadius: '8px', 
+          marginBottom: '1rem' 
+        }}>
+          {error}
+        </div>
+      )}
 
       <div className="form-busqueda">
         <input
@@ -130,18 +240,59 @@ const Cliente: React.FC = () => {
           value={busquedaId}
           onChange={(e) => setBusquedaId(e.target.value)}
         />
-        <button onClick={buscarClientePorId}>Buscar</button>
+        <button onClick={buscarClientePorId} disabled={loading}>
+          Buscar
+        </button>
       </div>
 
       <div className="formulario">
-        <input type="text" name="cliente_id" placeholder="ID" value={nuevoCliente.cliente_id} onChange={manejarCambio} disabled={!!editando} />
-        <input type="text" name="nombre" placeholder="Nombre" value={nuevoCliente.nombre} onChange={manejarCambio} />
-        <input type="text" name="apellido" placeholder="Apellido" value={nuevoCliente.apellido} onChange={manejarCambio} />
-        <input type="email" name="email" placeholder="Email" value={nuevoCliente.email} onChange={manejarCambio} />
-        <input type="text" name="telefono" placeholder="Teléfono" value={nuevoCliente.telefono} onChange={manejarCambio} />
+        <input 
+          type="text" 
+          name="cliente_id" 
+          placeholder="ID del Cliente" 
+          value={nuevoCliente.cliente_id} 
+          onChange={manejarCambio} 
+          disabled={!!editando || loading} 
+        />
+        <input 
+          type="text" 
+          name="cliente_nombre" 
+          placeholder="Nombre" 
+          value={nuevoCliente.cliente_nombre} 
+          onChange={manejarCambio}
+          disabled={!!editando || loading}
+        />
+        <input 
+          type="text" 
+          name="cliente_apellido" 
+          placeholder="Apellido" 
+          value={nuevoCliente.cliente_apellido} 
+          onChange={manejarCambio}
+          disabled={!!editando || loading}
+        />
+        <input 
+          type="email" 
+          name="cliente_gmail" 
+          placeholder="Email" 
+          value={nuevoCliente.cliente_gmail} 
+          onChange={manejarCambio}
+          disabled={loading}
+        />
+        <input 
+          type="text" 
+          name="cliente_telefono" 
+          placeholder="Teléfono" 
+          value={nuevoCliente.cliente_telefono} 
+          onChange={manejarCambio}
+          disabled={loading}
+        />
         
-        {/* Combobox para ciudad */}
-        <select name="ciudad" value={nuevoCliente.ciudad} onChange={manejarCambio}>
+        <select 
+          name="ciudad_id" 
+          value={nuevoCliente.ciudad_id} 
+          onChange={manejarCambio}
+          disabled={loading}
+        >
           <option value="">Seleccione una ciudad</option>
           {ciudades.map(ciudad => (
             <option key={ciudad.ciudad_key} value={ciudad.ciudad_key}>
@@ -152,11 +303,17 @@ const Cliente: React.FC = () => {
 
         {editando ? (
           <>
-            <button onClick={actualizarCliente}>Actualizar</button>
-            <button onClick={cancelarEdicion} className="btn-cancelar">Cancelar</button>
+            <button onClick={actualizarCliente} disabled={loading}>
+              {loading ? 'Actualizando...' : 'Actualizar'}
+            </button>
+            <button onClick={cancelarEdicion} className="btn-cancelar" disabled={loading}>
+              Cancelar
+            </button>
           </>
         ) : (
-          <button onClick={crearCliente}>Crear</button>
+          <button onClick={crearCliente} disabled={loading}>
+            {loading ? 'Creando...' : 'Crear'}
+          </button>
         )}
       </div>
 

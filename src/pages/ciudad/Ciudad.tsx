@@ -1,125 +1,193 @@
-import React, { useState, ChangeEvent, useEffect } from 'react';
-import axios from 'axios';
-import { useNavigate, useParams } from 'react-router-dom';
-import '../../components/css/Ciudades.css';
+"use client"
 
-const PRIMARY_API = 'https://autos-flask-umg-backend-ajbqcxhaaudjbdf0.mexicocentral-01.azurewebsites.net/ventas';
-const FALLBACK_API = 'http://127.0.0.1:5000/ventas';
+import type React from "react"
+import { useState, type ChangeEvent, useEffect } from "react"
+import axios from "axios"
+import { useNavigate, useParams } from "react-router-dom"
+import "../../components/css/Ciudades.css"
+
+const PRIMARY_API = "https://autos-flask-umg-backend-ajbqcxhaaudjbdf0.mexicocentral-01.azurewebsites.net/ventas"
+const FALLBACK_API = "http://127.0.0.1:5000/ventas"
 
 interface Ciudad {
-  ciudad_key: string;
-  ciudad_id: string;
-  ciudad_nombre: string;
-  region_key?: string;
+  ciudad_key: string
+  ciudad_id: string
+  ciudad_nombre: string
+  region_key?: string
 }
 
 interface Region {
-  region_key: string;
-  region_nombre: string;
+  region_key: string
+  region_nombre: string
 }
 
 const Ciudades: React.FC = () => {
-  const [nuevaCiudad, setNuevaCiudad] = useState<Omit<Ciudad, 'ciudad_id'>>({
-    ciudad_nombre: '',
-    ciudad_key: '',
-    region_key: ''
-  });
-  const [regiones, setRegiones] = useState<Region[]>([]);
-  const [editando, setEditando] = useState<boolean>(false);
-  const [busquedaId, setBusquedaId] = useState('');
-  const navigate = useNavigate();
-  const { id } = useParams<{ id: string }>();
+  const [nuevaCiudad, setNuevaCiudad] = useState({
+    ciudad_nombre: "",
+    region_key: "",
+  })
+  const [regiones, setRegiones] = useState<Region[]>([])
+  const [editando, setEditando] = useState<boolean>(false)
+  const [ciudadEditando, setCiudadEditando] = useState<Ciudad | null>(null)
+  const [busquedaId, setBusquedaId] = useState("")
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState("")
+  const navigate = useNavigate()
+  const { id } = useParams<{ id: string }>()
 
-  const apiRequest = async (method: 'get' | 'post' | 'put', endpoint: string, body?: any) => {
+  const apiRequest = async (method: "get" | "post" | "put", endpoint: string, body?: any) => {
     try {
-      return await axios({ method, url: `${PRIMARY_API}${endpoint}`, data: body });
+      return await axios({ method, url: `${PRIMARY_API}${endpoint}`, data: body })
     } catch {
-      return await axios({ method, url: `${FALLBACK_API}${endpoint}`, data: body });
+      return await axios({ method, url: `${FALLBACK_API}${endpoint}`, data: body })
     }
-  };
+  }
 
   useEffect(() => {
-    apiRequest('get', '/get/region')
-      .then(res => {
-        const lista = res.data.regiones || res.data;
-        setRegiones(lista);
-      })
-      .catch(err => console.error('Error al cargar regiones:', err));
-  }, []);
+    cargarRegiones()
+  }, [])
 
   useEffect(() => {
     if (id) {
-      apiRequest('get', `/get/ciudad/${id}`)
-        .then(res => {
-          const c = res.data;
-          setNuevaCiudad({
-            ciudad_nombre: c.ciudad_nombre || '',
-            ciudad_key: c.ciudad_key || c.ciudad_id,
-            region_key: c.region_key || ''
-          });
-          setEditando(true);
-        })
-        .catch(err => console.error('Error al obtener ciudad:', err));
-    } else {
-      setEditando(false);
+      cargarCiudadParaEdicion(id)
     }
-  }, [id]);
+  }, [id])
+
+  const cargarRegiones = async () => {
+    try {
+      const res = await apiRequest("get", "/get/region")
+      const lista = res.data.regiones || res.data
+      setRegiones(lista)
+    } catch (err) {
+      console.error("Error al cargar regiones:", err)
+      setError("Error al cargar las regiones")
+    }
+  }
+
+  const cargarCiudadParaEdicion = async (ciudadId: string) => {
+    try {
+      setLoading(true)
+      const res = await apiRequest("get", `/get/ciudad/${ciudadId}`)
+      const c = res.data
+      setNuevaCiudad({
+        ciudad_nombre: c.ciudad_nombre || "",
+        region_key: c.region_key || "",
+      })
+      setCiudadEditando(c)
+      setEditando(true)
+    } catch (err: any) {
+      console.error("Error al obtener ciudad:", err)
+      setError(err.response?.data?.message || "Error al cargar la ciudad")
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const manejarCambio = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setNuevaCiudad(prev => ({ ...prev, [name]: value }));
-  };
+    const { name, value } = e.target
+    setNuevaCiudad((prev) => ({ ...prev, [name]: value }))
+    setError("")
+  }
 
-  const crearCiudad = () => {
-    const { ciudad_nombre, region_key } = nuevaCiudad;
-    if (!ciudad_nombre || !region_key) return;
+  const validarFormulario = () => {
+    if (!nuevaCiudad.ciudad_nombre.trim()) {
+      setError("El nombre de la ciudad es requerido")
+      return false
+    }
+    if (!editando && !nuevaCiudad.region_key) {
+      setError("Debe seleccionar una región")
+      return false
+    }
+    return true
+  }
 
-    const payload = { ciudad_nombre, region_key };
+  const crearCiudad = async () => {
+    if (!validarFormulario()) return
 
-    apiRequest('post', '/post/ciudad', payload)
-      .then(() => setNuevaCiudad({ ciudad_nombre: '', ciudad_key: '', region_key: '' }))
-      .catch(err => console.error('Error al crear ciudad:', err));
-  };
+    try {
+      setLoading(true)
+      await apiRequest("post", "/post/ciudad", nuevaCiudad)
+      setNuevaCiudad({ ciudad_nombre: "", region_key: "" })
+      setError("")
+      alert("Ciudad creada exitosamente")
+    } catch (err: any) {
+      console.error("Error al crear ciudad:", err)
+      setError(err.response?.data?.message || "Error al crear la ciudad")
+    } finally {
+      setLoading(false)
+    }
+  }
 
-  const actualizarCiudad = () => {
-    const { ciudad_nombre, ciudad_key, region_key } = nuevaCiudad;
-    if (!ciudad_key) return;
+  const actualizarCiudad = async () => {
+    if (!ciudadEditando?.ciudad_key) return
+    if (!nuevaCiudad.ciudad_nombre.trim()) {
+      setError("El nombre de la ciudad es requerido")
+      return
+    }
 
-    const payload = { ciudad_nombre, region_key };
-
-    apiRequest('put', `/put/ciudad/${ciudad_key}`, payload)
-      .then(() => {
-        setEditando(false);
-        navigate('/lista-ciudades');
+    try {
+      setLoading(true)
+      await apiRequest("put", `/put/ciudad/${ciudadEditando.ciudad_key}`, {
+        ciudad_nombre: nuevaCiudad.ciudad_nombre,
       })
-      .catch(err => console.error('Error al actualizar ciudad:', err));
-  };
+      alert("Ciudad actualizada exitosamente")
+      cancelarEdicion()
+    } catch (err: any) {
+      console.error("Error al actualizar ciudad:", err)
+      setError(err.response?.data?.message || "Error al actualizar la ciudad")
+    } finally {
+      setLoading(false)
+    }
+  }
 
-  const obtenerCiudadPorId = () => {
-    if (!busquedaId) return;
+  const obtenerCiudadPorId = async () => {
+    if (!busquedaId.trim()) {
+      setError("Ingrese un ID para buscar")
+      return
+    }
 
-    apiRequest('get', `/get/ciudad/${busquedaId}`)
-      .then(res => {
-        const c = res.data;
-        setNuevaCiudad({
-          ciudad_nombre: c.ciudad_nombre,
-          ciudad_key: c.ciudad_key || c.ciudad_id,
-          region_key: c.region_key || ''
-        });
-        setEditando(true);
-      })
-      .catch(err => console.error('Ciudad no encontrada:', err));
-  };
+    try {
+      setLoading(true)
+      await cargarCiudadParaEdicion(busquedaId)
+      setBusquedaId("")
+    } catch (err) {
+      // El error ya se maneja en cargarCiudadParaEdicion
+    }
+  }
 
   const cancelarEdicion = () => {
-    setEditando(false);
-    setNuevaCiudad({ ciudad_nombre: '', ciudad_key: '', region_key: '' });
-    navigate('/lista-ciudades');
-  };
+    setEditando(false)
+    setCiudadEditando(null)
+    setNuevaCiudad({ ciudad_nombre: "", region_key: "" })
+    setError("")
+    navigate("/lista-ciudades")
+  }
+
+  if (loading && !editando) {
+    return (
+      <div className="ciudad-container">
+        <h2>Cargando...</h2>
+      </div>
+    )
+  }
 
   return (
     <div className="ciudad-container">
       <h2>Gestión de Ciudades</h2>
+
+      {error && (
+        <div
+          style={{
+            backgroundColor: "#ffebee",
+            color: "#c62828",
+            padding: "1rem",
+            borderRadius: "8px",
+            marginBottom: "1rem",
+          }}
+        >
+          {error}
+        </div>
+      )}
 
       <div className="form-busqueda">
         <input
@@ -128,25 +196,24 @@ const Ciudades: React.FC = () => {
           value={busquedaId}
           onChange={(e) => setBusquedaId(e.target.value)}
         />
-        <button onClick={obtenerCiudadPorId}>Buscar</button>
+        <button onClick={obtenerCiudadPorId} disabled={loading}>
+          Buscar
+        </button>
       </div>
 
       <div className="formulario">
         <input
           name="ciudad_nombre"
-          placeholder="Nombre"
+          placeholder="Nombre de la Ciudad"
           value={nuevaCiudad.ciudad_nombre}
           onChange={manejarCambio}
+          disabled={loading}
         />
 
         {!editando && (
-          <select
-            name="region_key"
-            value={nuevaCiudad.region_key}
-            onChange={manejarCambio}
-          >
+          <select name="region_key" value={nuevaCiudad.region_key} onChange={manejarCambio} disabled={loading}>
             <option value="">-- Selecciona una región --</option>
-            {regiones.map(region => (
+            {regiones.map((region) => (
               <option key={region.region_key} value={region.region_key}>
                 {region.region_nombre}
               </option>
@@ -156,19 +223,25 @@ const Ciudades: React.FC = () => {
 
         {editando ? (
           <>
-            <button onClick={actualizarCiudad}>Actualizar</button>
-            <button onClick={cancelarEdicion} className="btn-cancelar">Cancelar</button>
+            <button onClick={actualizarCiudad} disabled={loading}>
+              {loading ? "Actualizando..." : "Actualizar"}
+            </button>
+            <button onClick={cancelarEdicion} className="btn-cancelar" disabled={loading}>
+              Cancelar
+            </button>
           </>
         ) : (
-          <button onClick={crearCiudad}>Crear</button>
+          <button onClick={crearCiudad} disabled={loading}>
+            {loading ? "Creando..." : "Crear"}
+          </button>
         )}
       </div>
 
       <div className="mostrar-listado">
-        <button onClick={() => navigate('/lista-ciudades')}>Ir al listado de ciudades</button>
+        <button onClick={() => navigate("/lista-ciudades")}>Ir al listado de ciudades</button>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Ciudades;
+export default Ciudades
