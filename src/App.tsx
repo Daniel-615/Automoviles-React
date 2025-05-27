@@ -35,34 +35,62 @@ import Producto from "./pages/producto/Producto"
 import ListaProductos from "./pages/producto/ListaProductos"
 import Ventas from "./pages/ventas/Ventas"
 import ListaVentas from "./pages/ventas/ListaVentas"
-import Carousel from "react-multi-carousel"
-import "react-multi-carousel/lib/styles.css"
 import "./App.css"
 
 // Datos de la aplicación
-const vehiculos = [
-  { src: "/images/car1.jpg", title: "SUV Premium", description: "Tecnología avanzada y confort" },
-  { src: "/images/car2.jpg", title: "Sedán Ejecutivo", description: "Elegancia y rendimiento" },
-  { src: "/images/car3.jpg", title: "Hatchback Urbano", description: "Perfecto para la ciudad" },
-  { src: "/images/car4.jpg", title: "Crossover Familiar", description: "Espacio y versatilidad" },
-]
-
 const estadisticas = [
-  { titulo: "Clientes Activos", valor: "1,234", icono: "👥", color: "#1565c0" },
-  { titulo: "Tiendas", valor: "45", icono: "🏪", color: "#2e7d32" },
-  { titulo: "Vendedores", valor: "156", icono: "👨‍💼", color: "#f57c00" },
-  { titulo: "Ventas del Mes", valor: "Q 2.5M", icono: "💰", color: "#7b1fa2" },
+  { titulo: "Clientes Activos", valor: "1,234", icono: "👥", color: "#dc2626" },
+  { titulo: "Tiendas", valor: "45", icono: "🏪", color: "#dc2626" },
+  { titulo: "Vendedores", valor: "156", icono: "👨‍💼", color: "#dc2626" },
+  { titulo: "Ventas del Mes", valor: "Q 2.5M", icono: "💰", color: "#dc2626" },
 ]
 
-const accesosRapidos = [
-  { titulo: "Gestionar Clientes", ruta: "/cliente", icono: "👤", descripcion: "Crear y editar clientes" },
-  { titulo: "Administrar Tiendas", ruta: "/tiendas", icono: "🏢", descripcion: "Gestión de tiendas" },
-  { titulo: "Ver Reportes", ruta: "/tiendasBi", icono: "📊", descripcion: "Análisis y estadísticas" },
-  { titulo: "Vendedor-Tienda", ruta: "/vendedor_tienda", icono: "🤝", descripcion: "Asignar vendedores" },
-  { titulo: "Gestionar Productos", ruta: "/lista-productos", icono: "🚗", descripcion: "Catálogo de vehículos" },
-  { titulo: "Registrar Ventas", ruta: "/ventas", icono: "💰", descripcion: "Nueva transacción" },
-  { titulo: "Ver Ventas", ruta: "/lista-ventas", icono: "📋", descripcion: "Historial de ventas" },
-  { titulo: "Marcas y Modelos", ruta: "/lista-marcas", icono: "🏭", descripcion: "Gestión de marcas" },
+const caracteristicas = [
+  {
+    titulo: "Gestión de Clientes",
+    descripcion: "Sistema completo para administrar tu base de clientes con segmentación avanzada",
+    icono: "👤",
+    enlace: "/clientes",
+  },
+  {
+    titulo: "Control de Inventario",
+    descripcion: "Gestiona tu inventario de vehículos con categorías, marcas y modelos",
+    icono: "🚗",
+    enlace: "/lista-productos",
+  },
+  {
+    titulo: "Análisis de Ventas",
+    descripcion: "Reportes detallados y análisis en tiempo real de tu rendimiento",
+    icono: "📊",
+    enlace: "/tiendasBi",
+  },
+  {
+    titulo: "Gestión de Tiendas",
+    descripcion: "Administra múltiples ubicaciones y asigna vendedores eficientemente",
+    icono: "🏢",
+    enlace: "/lista-tiendas",
+  },
+]
+
+const servicios = [
+  {
+    titulo: "Gestionar Clientes",
+    ruta: "/cliente",
+    icono: "👤",
+    descripcion: "Crear y editar información de clientes",
+  },
+  { titulo: "Administrar Tiendas", ruta: "/tiendas", icono: "🏢", descripcion: "Gestión completa de tiendas" },
+  { titulo: "Ver Reportes", ruta: "/tiendasBi", icono: "📊", descripcion: "Análisis y estadísticas detalladas" },
+  { titulo: "Vendedor-Tienda", ruta: "/vendedor_tienda", icono: "🤝", descripcion: "Asignar vendedores a tiendas" },
+  {
+    titulo: "Gestionar Productos",
+    ruta: "/lista-productos",
+    icono: "🚗",
+    descripcion: "Catálogo completo de vehículos",
+  },
+  { titulo: "Registrar Ventas", ruta: "/ventas", icono: "💰", descripcion: "Nueva transacción de venta" },
+  { titulo: "Ver Ventas", ruta: "/lista-ventas", icono: "📋", descripcion: "Historial completo de ventas" },
+  { titulo: "Marcas y Modelos", ruta: "/lista-marcas", icono: "🏭", descripcion: "Gestión de marcas y modelos" },
 ]
 
 // Componente de Loading
@@ -109,139 +137,85 @@ const NotFoundPage = () => (
   </div>
 )
 
-// Componente de la página de inicio mejorada
+// Componente de la página de inicio
 const HomePage = () => {
-  const [fechaHora, setFechaHora] = useState({
-    fecha: "",
-    hora: "",
-    dia: "",
-    mes: "",
-    año: "",
-    ampm: "",
-  })
-
-  useEffect(() => {
-    const actualizarFechaHora = () => {
-      const ahora = new Date()
-
-      const opciones: Intl.DateTimeFormatOptions = {
-        weekday: "long",
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      }
-
-      const fecha = ahora.toLocaleDateString("es-ES", opciones)
-      const hora = ahora.toLocaleTimeString("es-ES", {
-        hour12: false,
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-      })
-
-      const dia = ahora.getDate().toString().padStart(2, "0")
-      const mes = ahora.toLocaleDateString("es-ES", { month: "short" })
-      const año = ahora.getFullYear().toString()
-
-      // Para formato 12 horas si se prefiere
-      // @ts-ignore
-      const hora12 = ahora.toLocaleTimeString("es-ES", {
-        hour12: true,
-        hour: "2-digit",
-        minute: "2-digit",
-      })
-      const ampm = ahora.getHours() >= 12 ? "PM" : "AM"
-
-      setFechaHora({
-        fecha,
-        hora,
-        dia,
-        mes: mes.charAt(0).toUpperCase() + mes.slice(1),
-        año,
-        ampm,
-      })
-    }
-
-    // Actualizar inmediatamente
-    actualizarFechaHora()
-
-    // Actualizar cada segundo
-    const intervalo = setInterval(actualizarFechaHora, 1000)
-
-    return () => clearInterval(intervalo)
-  }, [])
-
   return (
     <div className="home-page">
       {/* Hero Section */}
       <section className="hero-section">
         <div className="hero-content">
-          <div className="hero-text">
-            <h1 className="hero-title">
-              Bienvenido a <span className="brand-highlight">VentasApp</span>
-            </h1>
-            <p className="hero-subtitle">Sistema integral de gestión de ventas de vehículos</p>
-
-            {/* Reloj profesional mejorado */}
-            <div className="reloj-profesional">
-              <div className="reloj-container">
-                <div className="fecha-digital">
-                  <div className="dia-numero">{fechaHora.dia}</div>
-                  <div className="mes-año">
-                    <span className="mes">{fechaHora.mes}</span>
-                    <span className="año">{fechaHora.año}</span>
-                  </div>
-                </div>
-                <div className="separador-reloj"></div>
-                <div className="hora-digital">
-                  <div className="hora-principal">{fechaHora.hora}</div>
-                  <div className="zona-horaria">
-                    <span className="icono-reloj">🕐</span>
-                    <span>Guatemala</span>
-                  </div>
-                </div>
-              </div>
-              <div className="fecha-completa">
-                <span className="icono-calendario">📅</span>
-                <span>{fechaHora.fecha}</span>
-              </div>
-            </div>
+          <div className="hero-badge">
+            <span>Bienvenido a AutoVentas</span>
           </div>
 
-          <div className="carousel-section">
-            <Carousel
-              additionalTransfrom={0}
-              arrows
-              autoPlay
-              autoPlaySpeed={5000}
-              centerMode={false}
-              className="carousel-container"
-              containerClass="carousel-wrapper"
-              draggable
-              infinite
-              itemClass="carousel-item-padding"
-              keyBoardControl
-              minimumTouchDrag={80}
-              responsive={{
-                desktop: { breakpoint: { max: 3000, min: 1024 }, items: 2 },
-                tablet: { breakpoint: { max: 1024, min: 768 }, items: 1 },
-                mobile: { breakpoint: { max: 768, min: 0 }, items: 1 },
-              }}
-              showDots={true}
-              swipeable
-            >
-              {vehiculos.map((vehiculo, index) => (
-                <div key={index} className="carousel-item">
-                  <div className="vehicle-card">
-                    <img src={vehiculo.src || "/placeholder.svg"} alt={vehiculo.title} className="carousel-image" />
-                    <div className="vehicle-overlay">
-                      <h3>{vehiculo.title}</h3>
-                      <p>{vehiculo.description}</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </Carousel>
+          <h1 className="hero-title">
+            Find Your <span className="highlight">Dream Car</span>
+            <br />
+            With Us
+          </h1>
+
+          <p className="hero-subtitle">
+            Explore A Vast Collection Of New And Pre-Owned Cars Tailored To Meet Your Driving Needs And Budget
+          </p>
+
+          <div className="hero-actions">
+            <a href="/lista-productos" className="btn-primary">
+              <span>🚗</span>
+              EXPLORE MORE
+            </a>
+            <a href="/tiendasBi" className="btn-secondary">
+              <span>📊</span>
+              View Reports
+            </a>
+          </div>
+
+          {/* Search Bar */}
+          <div className="search-bar">
+            <form className="search-form">
+              <div className="form-group">
+                <label htmlFor="car-make">Car Make</label>
+                <select id="car-make" name="car-make">
+                  <option value="">Select Make</option>
+                  <option value="toyota">Toyota</option>
+                  <option value="honda">Honda</option>
+                  <option value="ford">Ford</option>
+                  <option value="chevrolet">Chevrolet</option>
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="car-model">Select A Model First</label>
+                <select id="car-model" name="car-model">
+                  <option value="">Select Model</option>
+                  <option value="sedan">Sedan</option>
+                  <option value="suv">SUV</option>
+                  <option value="hatchback">Hatchback</option>
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="car-type">Car Type</label>
+                <select id="car-type" name="car-type">
+                  <option value="">Select Type</option>
+                  <option value="new">New</option>
+                  <option value="used">Used</option>
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="car-year">Select Year</label>
+                <select id="car-year" name="car-year">
+                  <option value="">Select Year</option>
+                  <option value="2024">2024</option>
+                  <option value="2023">2023</option>
+                  <option value="2022">2022</option>
+                </select>
+              </div>
+
+              <button type="submit" className="search-btn">
+                🔍 Search
+              </button>
+            </form>
           </div>
         </div>
       </section>
@@ -249,68 +223,76 @@ const HomePage = () => {
       {/* Estadísticas */}
       <section className="stats-section">
         <div className="container">
-          <h2 className="section-title">Resumen del Sistema</h2>
+          <h2 className="section-title">Nuestros Números</h2>
+          <p className="section-subtitle">Cifras que demuestran nuestro compromiso con la excelencia</p>
           <div className="stats-grid">
             {estadisticas.map((stat, index) => (
-              <div key={index} className="stat-card" style={{ borderTopColor: stat.color }}>
-                <div className="stat-icon" style={{ backgroundColor: `${stat.color}20` }}>
-                  {stat.icono}
-                </div>
-                <div className="stat-info">
-                  <h3 className="stat-value" style={{ color: stat.color }}>
-                    {stat.valor}
-                  </h3>
-                  <p className="stat-title">{stat.titulo}</p>
-                </div>
+              <div key={index} className="stat-card">
+                <div className="stat-icon">{stat.icono}</div>
+                <h3 className="stat-value">{stat.valor}</h3>
+                <p className="stat-title">{stat.titulo}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Accesos Rápidos */}
-      <section className="quick-access-section">
+      {/* Características */}
+      <section className="features-section">
         <div className="container">
-          <h2 className="section-title">Accesos Rápidos</h2>
-          <div className="access-grid">
-            {accesosRapidos.map((acceso, index) => (
-              <a key={index} href={acceso.ruta} className="access-card">
-                <div className="access-icon">{acceso.icono}</div>
-                <h3 className="access-title">{acceso.titulo}</h3>
-                <p className="access-description">{acceso.descripcion}</p>
-                <div className="access-arrow">→</div>
+          <h2 className="section-title">¿Por Qué Elegirnos?</h2>
+          <p className="section-subtitle">Ofrecemos las mejores herramientas para gestionar tu negocio automotriz</p>
+          <div className="features-grid">
+            {caracteristicas.map((feature, index) => (
+              <div key={index} className="feature-card">
+                <div className="feature-icon">{feature.icono}</div>
+                <h3 className="feature-title">{feature.titulo}</h3>
+                <p className="feature-description">{feature.descripcion}</p>
+                <a href={feature.enlace} className="feature-link">
+                  Explorar <span>→</span>
+                </a>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Servicios */}
+      <section className="services-section">
+        <div className="container">
+          <h2 className="section-title">Nuestros Servicios</h2>
+          <p className="section-subtitle">Accede rápidamente a todas las funcionalidades del sistema</p>
+          <div className="services-grid">
+            {servicios.map((servicio, index) => (
+              <a key={index} href={servicio.ruta} className="service-card">
+                <div className="service-icon">{servicio.icono}</div>
+                <h3 className="service-title">{servicio.titulo}</h3>
+                <p className="service-description">{servicio.descripcion}</p>
+                <div className="service-arrow">→</div>
               </a>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Información adicional */}
-      <section className="info-section">
+      {/* Call to Action */}
+      <section className="cta-section">
         <div className="container">
-          <div className="info-content">
-            <h2>Gestiona tu negocio de manera eficiente</h2>
+          <div className="cta-content">
+            <h2>¿Listo para comenzar?</h2>
             <p>
-              Controla clientes, vendedores, tiendas, regiones y más desde una plataforma centralizada. Obtén reportes
-              detallados y toma decisiones basadas en datos reales.
+              Únete a miles de concesionarios que ya confían en nuestra plataforma para gestionar sus ventas de manera
+              eficiente.
             </p>
-            <div className="features-grid">
-              <div className="feature-item">
-                <span className="feature-icon">✅</span>
-                <span>Gestión completa de clientes y vendedores</span>
-              </div>
-              <div className="feature-item">
-                <span className="feature-icon">✅</span>
-                <span>Control de tiendas y ubicaciones</span>
-              </div>
-              <div className="feature-item">
-                <span className="feature-icon">✅</span>
-                <span>Reportes y análisis en tiempo real</span>
-              </div>
-              <div className="feature-item">
-                <span className="feature-icon">✅</span>
-                <span>Segmentación avanzada de clientes</span>
-              </div>
+            <div className="cta-actions">
+              <a href="/cliente" className="btn-white">
+                <span>🚀</span>
+                Comenzar Ahora
+              </a>
+              <a href="/tiendasBi" className="btn-white">
+                <span>📞</span>
+                Ver Demo
+              </a>
             </div>
           </div>
         </div>

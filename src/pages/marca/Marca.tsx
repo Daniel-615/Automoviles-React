@@ -69,7 +69,7 @@ const Marca: React.FC = () => {
         <div className="header-content">
           <div className="title-section">
             <h1 className="page-title">
-              <span className="title-icon">🏭</span>
+              <span className="title-icon"></span>
               Gestión de Marcas
             </h1>
             <p className="page-subtitle">Administra las marcas de vehículos del sistema</p>
@@ -77,7 +77,7 @@ const Marca: React.FC = () => {
 
           <div className="header-actions">
             <Link to="/lista-marcas" className="btn btn-outline">
-              <span className="btn-icon">📋</span>
+              <span className="btn-icon"></span>
               Ver Lista de Marcas
             </Link>
           </div>
@@ -89,7 +89,7 @@ const Marca: React.FC = () => {
         <div className="marca-form-card">
           <div className="card-header">
             <h2 className="card-title">
-              <span className="card-icon">➕</span>
+              <span className="card-icon"></span>
               Nueva Marca
             </h2>
             <p className="card-subtitle">Registra una nueva marca de vehículos</p>
@@ -98,7 +98,7 @@ const Marca: React.FC = () => {
           <form onSubmit={handleSubmit} className="marca-form">
             <div className="form-group">
               <label htmlFor="nombre_marca" className="form-label">
-                <span className="label-icon">🏷️</span>
+                <span className="label-icon"></span>
                 Nombre de la Marca
                 <span className="required">*</span>
               </label>
@@ -124,7 +124,7 @@ const Marca: React.FC = () => {
 
             <div className="form-actions">
               <button type="button" onClick={handleReset} className="btn btn-secondary" disabled={loading}>
-                <span className="btn-icon">🔄</span>
+                <span className="btn-icon"></span>
                 Limpiar
               </button>
 
@@ -136,7 +136,7 @@ const Marca: React.FC = () => {
                   </>
                 ) : (
                   <>
-                    <span className="btn-icon">💾</span>
+                    <span className="btn-icon"></span>
                     Crear Marca
                   </>
                 )}
@@ -149,35 +149,35 @@ const Marca: React.FC = () => {
         <div className="info-panel">
           <div className="info-header">
             <h3 className="info-title">
-              <span className="info-icon">💡</span>
+              <span className="info-icon"></span>
               Información sobre Marcas
             </h3>
           </div>
 
           <div className="info-content">
             <div className="info-item">
-              <span className="item-icon">🚗</span>
+              <span className="item-icon"></span>
               <div className="item-text">
                 <strong>Fabricantes:</strong> Las marcas representan los fabricantes de vehículos
               </div>
             </div>
 
             <div className="info-item">
-              <span className="item-icon">📝</span>
+              <span className="item-icon"></span>
               <div className="item-text">
                 <strong>Unicidad:</strong> El nombre debe ser único en el sistema
               </div>
             </div>
 
             <div className="info-item">
-              <span className="item-icon">🔗</span>
+              <span className="item-icon"></span>
               <div className="item-text">
                 <strong>Relaciones:</strong> Las marcas se relacionan con los modelos de vehículos
               </div>
             </div>
 
             <div className="info-item">
-              <span className="item-icon">✨</span>
+              <span className="item-icon"></span>
               <div className="item-text">
                 <strong>Ejemplos:</strong> Toyota, Honda, Ford, BMW, Mercedes-Benz, Audi
               </div>
@@ -188,15 +188,15 @@ const Marca: React.FC = () => {
             <h4 className="quick-title">Acciones Rápidas</h4>
             <div className="quick-buttons">
               <Link to="/lista-marcas" className="quick-btn">
-                <span className="quick-icon">📋</span>
+                <span className="quick-icon"></span>
                 Ver Todas
               </Link>
               <Link to="/modelo" className="quick-btn">
-                <span className="quick-icon">🚗</span>
+                <span className="quick-icon"></span>
                 Crear Modelo
               </Link>
               <Link to="/producto" className="quick-btn">
-                <span className="quick-icon">🚙</span>
+                <span className="quick-icon"></span>
                 Crear Producto
               </Link>
             </div>

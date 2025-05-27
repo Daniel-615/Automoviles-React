@@ -130,7 +130,7 @@ const ListaCategorias: React.FC = () => {
         <span className="error-icon">❌</span>
         <p>{error}</p>
         <button onClick={() => fetchCategorias(currentPage)} className="retry-btn">
-          🔄 Reintentar
+          Reintentar
         </button>
       </div>
     )
@@ -139,7 +139,7 @@ const ListaCategorias: React.FC = () => {
   return (
     <div className="lista-categorias-container">
       <div className="lista-header">
-        <h1>🏷️ Lista de Categorías</h1>
+        <h1>Lista de Categorías</h1>
         <div className="header-actions">
           <div className="search-container">
             <span className="search-icon">🔍</span>
@@ -209,19 +209,19 @@ const ListaCategorias: React.FC = () => {
                     {editingId === categoria.categoria_key ? (
                       <>
                         <button onClick={handleSave} className="save-btn">
-                          💾 Guardar
+                          Guardar
                         </button>
                         <button onClick={() => setEditingId(null)} className="cancel-btn">
-                          ❌ Cancelar
+                          Cancelar
                         </button>
                       </>
                     ) : (
                       <>
                         <button onClick={() => handleEdit(categoria)} className="edit-btn">
-                          ✏️ Editar
+                          Editar
                         </button>
                         <button onClick={() => handleDelete(categoria.categoria_key)} className="delete-btn">
-                          🗑️ Eliminar
+                          Eliminar
                         </button>
                       </>
                     )}
