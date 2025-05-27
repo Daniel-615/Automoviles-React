@@ -30,6 +30,7 @@ const ListaFechas: React.FC = () => {
   const [error, setError] = useState<string | null>(null)
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
+  const [totalRecords, setTotalRecords] = useState(0)
   const [searchTerm, setSearchTerm] = useState("")
   const [editingId, setEditingId] = useState<number | null>(null)
   const [editData, setEditData] = useState<Partial<FechaItem>>({})
@@ -49,6 +50,7 @@ const ListaFechas: React.FC = () => {
       setFechas(data.fechas)
       setCurrentPage(data.pagina_actual)
       setTotalPages(data.total_paginas)
+      setTotalRecords(data.total)
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error desconocido")
     } finally {
@@ -141,12 +143,25 @@ const ListaFechas: React.FC = () => {
       fecha.mes.toLowerCase().includes(searchTerm.toLowerCase()),
   )
 
+  const getStatsData = () => {
+    const weekends = fechas.filter((f) => f.indicador_fin_semana).length
+    const holidays = fechas.filter((f) => f.indicador_feriado).length
+    const weekdays = fechas.length - weekends
+
+    return { weekends, holidays, weekdays, total: fechas.length }
+  }
+
+  const stats = getStatsData()
+
   if (loading) {
     return (
       <div className="lista-fechas-container">
         <div className="loading-container">
           <div className="loading-spinner"></div>
-          <p>✨ Cargando fechas mágicas...</p>
+          <div className="loading-text">
+            <h3>Cargando Fechas</h3>
+            <p>Procesando información temporal...</p>
+          </div>
         </div>
       </div>
     )
@@ -156,11 +171,15 @@ const ListaFechas: React.FC = () => {
     return (
       <div className="lista-fechas-container">
         <div className="error-container">
-          <span className="error-icon">🚨</span>
-          <p>{error}</p>
-          <button onClick={() => fetchFechas(currentPage)} className="retry-btn">
-            🔄 Reintentar
-          </button>
+          <div className="error-icon">⚠️</div>
+          <div className="error-content">
+            <h3>Error de Conexión</h3>
+            <p>{error}</p>
+            <button onClick={() => fetchFechas(currentPage)} className="retry-btn">
+              <span className="btn-icon">🔄</span>
+              Reintentar Carga
+            </button>
+          </div>
         </div>
       </div>
     )
@@ -168,171 +187,269 @@ const ListaFechas: React.FC = () => {
 
   return (
     <div className="lista-fechas-container">
-      <div className="lista-header">
-        <h1>📅 Lista de Fechas</h1>
-        <div className="header-actions">
-          <div className="search-container">
+      {/* Header Principal */}
+      <div className="main-header">
+        <div className="header-content">
+          <div className="title-section">
+            <h1 className="main-title">
+              <span className="title-icon">📅</span>
+              Gestión de Fechas
+            </h1>
+            <p className="subtitle">Sistema de administración temporal avanzado</p>
+          </div>
+
+          <div className="stats-grid">
+            <div className="stat-card">
+              <div className="stat-icon">📊</div>
+              <div className="stat-content">
+                <span className="stat-number">{totalRecords}</span>
+                <span className="stat-label">Total Fechas</span>
+              </div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-icon">💼</div>
+              <div className="stat-content">
+                <span className="stat-number">{stats.weekdays}</span>
+                <span className="stat-label">Días Laborales</span>
+              </div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-icon">🏖️</div>
+              <div className="stat-content">
+                <span className="stat-number">{stats.weekends}</span>
+                <span className="stat-label">Fines de Semana</span>
+              </div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-icon">🎉</div>
+              <div className="stat-content">
+                <span className="stat-number">{stats.holidays}</span>
+                <span className="stat-label">Feriados</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Controles de Acción */}
+      <div className="controls-section">
+        <div className="search-container">
+          <div className="search-wrapper">
             <input
               type="text"
-              placeholder="Buscar fechas mágicas..."
+              placeholder="Buscar por fecha, día o mes..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="search-input"
             />
-            <span className="search-icon">🔍</span>
+            <div className="search-icon">🔍</div>
           </div>
-          <button onClick={handleNavigateToCreate} className="create-btn">
-            ✨ Crear Nueva Fecha
-          </button>
+        </div>
+
+        <button onClick={handleNavigateToCreate} className="create-btn">
+          <span className="btn-icon">✨</span>
+          Nueva Fecha
+        </button>
+      </div>
+
+      {/* Tabla de Fechas */}
+      <div className="table-section">
+        <div className="table-container">
+          <table className="fechas-table">
+            <thead>
+              <tr>
+                <th>
+                  <span className="th-content">
+                    <span className="th-icon">🆔</span>ID
+                  </span>
+                </th>
+                <th>
+                  <span className="th-content">
+                    <span className="th-icon">📅</span>Fecha Completa
+                  </span>
+                </th>
+                <th>
+                  <span className="th-content">
+                    <span className="th-icon">📆</span>Día
+                  </span>
+                </th>
+                <th>
+                  <span className="th-content">
+                    <span className="th-icon">🗓️</span>Día Semana
+                  </span>
+                </th>
+                <th>
+                  <span className="th-content">
+                    <span className="th-icon">📊</span>Semana
+                  </span>
+                </th>
+                <th>
+                  <span className="th-content">
+                    <span className="th-icon">🗓️</span>Mes
+                  </span>
+                </th>
+                <th>
+                  <span className="th-content">
+                    <span className="th-icon">📈</span>Trimestre
+                  </span>
+                </th>
+                <th>
+                  <span className="th-content">
+                    <span className="th-icon">📅</span>Año
+                  </span>
+                </th>
+                <th>
+                  <span className="th-content">
+                    <span className="th-icon">🏖️</span>Fin Semana
+                  </span>
+                </th>
+                <th>
+                  <span className="th-content">
+                    <span className="th-icon">🎉</span>Feriado
+                  </span>
+                </th>
+                <th>
+                  <span className="th-content">
+                    <span className="th-icon">⚡</span>Acciones
+                  </span>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredFechas.map((fecha, index) => (
+                <tr key={fecha.fecha_key} className={index % 2 === 0 ? "row-even" : "row-odd"}>
+                  <td>
+                    <div className="id-badge">{fecha.fecha_key}</div>
+                  </td>
+                  <td>
+                    <div className={`date-badge ${getDateBadgeClass(fecha)}`}>
+                      <span className="date-icon">📅</span>
+                      <span className="date-text">{formatDate(fecha.fecha_completa)}</span>
+                    </div>
+                  </td>
+                  <td>
+                    <div className="day-badge">{fecha.dia}</div>
+                  </td>
+                  <td>
+                    <div className="weekday-badge">
+                      <span className="weekday-icon">🗓️</span>
+                      <span className="weekday-text">{fecha.dia_semana}</span>
+                    </div>
+                  </td>
+                  <td>
+                    <div className="week-badge">
+                      <span className="week-icon">📊</span>
+                      <span className="week-text">S{fecha.semana}</span>
+                    </div>
+                  </td>
+                  <td>
+                    <div className="month-badge">
+                      <span className="month-icon">🗓️</span>
+                      <span className="month-text">{fecha.mes}</span>
+                    </div>
+                  </td>
+                  <td>
+                    <div className="quarter-badge">
+                      <span className="quarter-icon">📈</span>
+                      <span className="quarter-text">Q{fecha.trimestre}</span>
+                    </div>
+                  </td>
+                  <td>
+                    <div className="year-badge">{fecha.ano}</div>
+                  </td>
+                  <td>
+                    <div className={`indicator-badge ${fecha.indicador_fin_semana ? "active" : "inactive"}`}>
+                      <span className="indicator-icon">{fecha.indicador_fin_semana ? "🏖️" : "💼"}</span>
+                      <span className="indicator-text">{fecha.indicador_fin_semana ? "Sí" : "No"}</span>
+                    </div>
+                  </td>
+                  <td>
+                    <div className={`indicator-badge ${fecha.indicador_feriado ? "active" : "inactive"}`}>
+                      <span className="indicator-icon">{fecha.indicador_feriado ? "🎉" : "📅"}</span>
+                      <span className="indicator-text">{fecha.indicador_feriado ? "Sí" : "No"}</span>
+                    </div>
+                  </td>
+                  <td>
+                    <div className="action-buttons">
+                      {editingId === fecha.fecha_key ? (
+                        <>
+                          <button onClick={handleSave} className="save-btn">
+                            <span className="btn-icon">💾</span>
+                            Guardar
+                          </button>
+                          <button onClick={() => setEditingId(null)} className="cancel-btn">
+                            <span className="btn-icon">❌</span>
+                            Cancelar
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          <button onClick={() => handleEdit(fecha)} className="edit-btn">
+                            <span className="btn-icon">✏️</span>
+                            Editar
+                          </button>
+                          <button onClick={() => handleDelete(fecha.fecha_key)} className="delete-btn">
+                            <span className="btn-icon">🗑️</span>
+                            Eliminar
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
 
-      <div className="table-container">
-        <table className="fechas-table">
-          <thead>
-            <tr>
-              <th>🆔 ID</th>
-              <th>📅 Fecha</th>
-              <th>📆 Día</th>
-              <th>🗓️ Día Semana</th>
-              <th>📊 Semana</th>
-              <th>🗓️ Mes</th>
-              <th>📈 Trimestre</th>
-              <th>📅 Año</th>
-              <th>🏖️ Fin Semana</th>
-              <th>🎉 Feriado</th>
-              <th>⚡ Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredFechas.map((fecha) => (
-              <tr key={fecha.fecha_key}>
-                <td>
-                  <span style={{ fontFamily: "monospace", fontWeight: "bold", color: "#6b7280" }}>
-                    {fecha.fecha_key}
-                  </span>
-                </td>
-                <td>
-                  <span className={`date-badge ${getDateBadgeClass(fecha)}`}>
-                    📅 {formatDate(fecha.fecha_completa)}
-                  </span>
-                </td>
-                <td>
-                  <span style={{ fontSize: "1.1rem", fontWeight: "600" }}>{fecha.dia}</span>
-                </td>
-                <td>
-                  <span
-                    style={{
-                      padding: "4px 12px",
-                      background: "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)",
-                      color: "white",
-                      borderRadius: "20px",
-                      fontSize: "0.8rem",
-                      fontWeight: "600",
-                    }}
-                  >
-                    {fecha.dia_semana}
-                  </span>
-                </td>
-                <td>
-                  <span
-                    style={{
-                      padding: "6px 12px",
-                      background: "linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)",
-                      color: "#374151",
-                      borderRadius: "12px",
-                      fontSize: "0.85rem",
-                      fontWeight: "600",
-                    }}
-                  >
-                    📊 {fecha.semana}
-                  </span>
-                </td>
-                <td>
-                  <span
-                    style={{
-                      padding: "6px 12px",
-                      background: "linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)",
-                      color: "#374151",
-                      borderRadius: "12px",
-                      fontSize: "0.85rem",
-                      fontWeight: "600",
-                    }}
-                  >
-                    🗓️ {fecha.mes}
-                  </span>
-                </td>
-                <td>
-                  <span className="quarter-badge">📈 Q{fecha.trimestre}</span>
-                </td>
-                <td>
-                  <span
-                    style={{
-                      fontSize: "1.1rem",
-                      fontWeight: "700",
-                      color: "#374151",
-                    }}
-                  >
-                    {fecha.ano}
-                  </span>
-                </td>
-                <td>
-                  <span className={`indicator ${fecha.indicador_fin_semana ? "active" : "inactive"}`}>
-                    {fecha.indicador_fin_semana ? "🏖️" : "💼"}
-                  </span>
-                </td>
-                <td>
-                  <span className={`indicator ${fecha.indicador_feriado ? "active" : "inactive"}`}>
-                    {fecha.indicador_feriado ? "🎉" : "📅"}
-                  </span>
-                </td>
-                <td>
-                  <div className="action-buttons">
-                    {editingId === fecha.fecha_key ? (
-                      <>
-                        <button onClick={handleSave} className="save-btn">
-                          💾 Guardar
-                        </button>
-                        <button onClick={() => setEditingId(null)} className="cancel-btn">
-                          ❌ Cancelar
-                        </button>
-                      </>
-                    ) : (
-                      <>
-                        <button onClick={() => handleEdit(fecha)} className="edit-btn">
-                          ✏️ Editar
-                        </button>
-                        <button onClick={() => handleDelete(fecha.fecha_key)} className="delete-btn">
-                          🗑️ Eliminar
-                        </button>
-                      </>
-                    )}
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      {/* Paginación */}
+      <div className="pagination-section">
+        <div className="pagination-info">
+          <span className="pagination-text">
+            Mostrando {(currentPage - 1) * 10 + 1} - {Math.min(currentPage * 10, totalRecords)} de {totalRecords} fechas
+          </span>
+        </div>
 
-      <div className="pagination">
-        <button
-          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-          disabled={currentPage === 1}
-          className="pagination-btn"
-        >
-          ⬅️ Anterior
-        </button>
-        <span className="pagination-info">
-          Página {currentPage} de {totalPages}
-        </span>
-        <button
-          onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-          disabled={currentPage === totalPages}
-          className="pagination-btn"
-        >
-          Siguiente ➡️
-        </button>
+        <div className="pagination-controls">
+          <button onClick={() => setCurrentPage(1)} disabled={currentPage === 1} className="pagination-btn first">
+            <span className="btn-icon">⏮️</span>
+            Primera
+          </button>
+
+          <button
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+            className="pagination-btn prev"
+          >
+            <span className="btn-icon">⬅️</span>
+            Anterior
+          </button>
+
+          <div className="page-indicator">
+            <span className="current-page">{currentPage}</span>
+            <span className="page-separator">de</span>
+            <span className="total-pages">{totalPages}</span>
+          </div>
+
+          <button
+            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+            disabled={currentPage === totalPages}
+            className="pagination-btn next"
+          >
+            Siguiente
+            <span className="btn-icon">➡️</span>
+          </button>
+
+          <button
+            onClick={() => setCurrentPage(totalPages)}
+            disabled={currentPage === totalPages}
+            className="pagination-btn last"
+          >
+            Última
+            <span className="btn-icon">⏭️</span>
+          </button>
+        </div>
       </div>
     </div>
   )
