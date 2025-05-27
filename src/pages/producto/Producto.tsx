@@ -131,31 +131,28 @@ const Producto: React.FC = () => {
   }
 
   const handleNavigateToList = () => {
-    // Para Vite + React, puedes usar:
     window.location.href = "/lista-productos"
-    // O si usas React Router:
-    // navigate('/lista-productos')
   }
 
   return (
     <div className="producto-container">
       <div className="producto-header">
-        <h1>🚙 Gestión de Productos</h1>
-        <p>Administra los productos del catálogo de vehículos</p>
+        <div className="header-content">
+          <h1>🚙 Gestión de Productos</h1>
+          <p>Administra los productos del catálogo de vehículos</p>
+        </div>
       </div>
 
       <div className="producto-form-container">
-        <button onClick={handleNavigateToList} className="nav-btn">
-          <span className="btn-icon">📋</span>
-          Ver Lista de Productos
-        </button>
+        <div className="navigation-section">
+          <button onClick={handleNavigateToList} className="nav-btn">
+            📋 Ver Lista de Productos
+          </button>
+        </div>
 
         <form onSubmit={handleSubmit} className="producto-form">
           <div className="form-group full-width">
-            <label htmlFor="nombre_producto">
-              <span className="label-icon">🏷️</span>
-              Nombre del Producto *
-            </label>
+            <label htmlFor="nombre_producto">🏷️ Nombre del Producto *</label>
             <input
               type="text"
               id="nombre_producto"
@@ -168,10 +165,7 @@ const Producto: React.FC = () => {
           </div>
 
           <div className="form-group full-width">
-            <label htmlFor="descripcion">
-              <span className="label-icon">📄</span>
-              Descripción
-            </label>
+            <label htmlFor="descripcion">📄 Descripción</label>
             <textarea
               id="descripcion"
               name="descripcion"
@@ -184,13 +178,10 @@ const Producto: React.FC = () => {
 
           <div className="form-row">
             <div className="form-group">
-              <label htmlFor="modelo_key">
-                <span className="label-icon">🚗</span>
-                Modelo *
-              </label>
+              <label htmlFor="modelo_key">🚗 Modelo *</label>
               {loadingData ? (
                 <div className="loading-select">
-                  <span className="loading-spinner"></span>
+                  <div className="loading-spinner"></div>
                   Cargando modelos...
                 </div>
               ) : (
@@ -212,13 +203,10 @@ const Producto: React.FC = () => {
             </div>
 
             <div className="form-group">
-              <label htmlFor="categoria_key">
-                <span className="label-icon">🏷️</span>
-                Categoría *
-              </label>
+              <label htmlFor="categoria_key">🏷️ Categoría *</label>
               {loadingData ? (
                 <div className="loading-select">
-                  <span className="loading-spinner"></span>
+                  <div className="loading-spinner"></div>
                   Cargando categorías...
                 </div>
               ) : (
@@ -242,10 +230,7 @@ const Producto: React.FC = () => {
 
           <div className="form-row">
             <div className="form-group">
-              <label htmlFor="año_fabricacion">
-                <span className="label-icon">📅</span>
-                Año de Fabricación *
-              </label>
+              <label htmlFor="año_fabricacion">📅 Año de Fabricación *</label>
               <input
                 type="number"
                 id="año_fabricacion"
@@ -259,10 +244,7 @@ const Producto: React.FC = () => {
             </div>
 
             <div className="form-group">
-              <label htmlFor="color">
-                <span className="label-icon">🎨</span>
-                Color
-              </label>
+              <label htmlFor="color">🎨 Color</label>
               <input
                 type="text"
                 id="color"
@@ -275,10 +257,7 @@ const Producto: React.FC = () => {
           </div>
 
           <div className="form-group full-width">
-            <label htmlFor="precio_lista">
-              <span className="label-icon">💰</span>
-              Precio de Lista *
-            </label>
+            <label htmlFor="precio_lista">💰 Precio de Lista *</label>
             <input
               type="number"
               id="precio_lista"
@@ -294,22 +273,19 @@ const Producto: React.FC = () => {
 
           {message && (
             <div className={`message ${message.type}`}>
-              <span className="message-icon">{message.type === "success" ? "✅" : "❌"}</span>
-              {message.text}
+              <div className="message-icon">{message.type === "success" ? "✅" : "❌"}</div>
+              <span>{message.text}</span>
             </div>
           )}
 
           <button type="submit" disabled={loading || loadingData} className="submit-btn">
             {loading ? (
               <>
-                <span className="loading-spinner"></span>
+                <div className="loading-spinner"></div>
                 Creando...
               </>
             ) : (
-              <>
-                <span className="btn-icon">💾</span>
-                Crear Producto
-              </>
+              <>💾 Crear Producto</>
             )}
           </button>
         </form>
@@ -317,10 +293,10 @@ const Producto: React.FC = () => {
         <div className="producto-info">
           <h3>💡 Información sobre Productos</h3>
           <ul>
-            <li data-icon="🚙">Los productos representan vehículos específicos del inventario</li>
-            <li data-icon="🔗">Cada producto pertenece a un modelo y una categoría</li>
-            <li data-icon="💰">El precio de lista es el precio base del vehículo</li>
-            <li data-icon="🎨">El color es opcional pero recomendado para identificación</li>
+            <li>🚙 Los productos representan vehículos específicos del inventario</li>
+            <li>🔗 Cada producto pertenece a un modelo y una categoría</li>
+            <li>💰 El precio de lista es el precio base del vehículo</li>
+            <li>🎨 El color es opcional pero recomendado para identificación</li>
           </ul>
         </div>
       </div>

@@ -169,26 +169,6 @@ const ListaProductos: React.FC = () => {
     window.location.href = "/producto"
   }
 
-  const getColorStyle = (color: string) => {
-    const colorMap: { [key: string]: string } = {
-      rojo: "#ef4444",
-      azul: "#3b82f6",
-      verde: "#22c55e",
-      amarillo: "#eab308",
-      negro: "#1f2937",
-      blanco: "#f9fafb",
-      gris: "#6b7280",
-      plata: "#9ca3af",
-      dorado: "#f59e0b",
-      naranja: "#f97316",
-      púrpura: "#a855f7",
-      rosa: "#ec4899",
-      metálico: "#71717a",
-    }
-
-    return colorMap[color?.toLowerCase()] || "#6b7280"
-  }
-
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("es-MX", {
       style: "currency",
@@ -217,7 +197,7 @@ const ListaProductos: React.FC = () => {
   if (error) {
     return (
       <div className="error-container">
-        <span className="error-icon">❌</span>
+        <div className="error-icon">❌</div>
         <p>{error}</p>
         <button onClick={() => fetchProductos(currentPage)} className="retry-btn">
           🔄 Reintentar
@@ -229,10 +209,12 @@ const ListaProductos: React.FC = () => {
   return (
     <div className="lista-productos-container">
       <div className="lista-header">
-        <h1>🚙 Lista de Productos</h1>
+        <div className="header-content">
+          <h1>🚙 Lista de Productos</h1>
+          <p>Gestiona el catálogo completo de vehículos</p>
+        </div>
         <div className="header-actions">
           <div className="search-container">
-            <span className="search-icon">🔍</span>
             <input
               type="text"
               placeholder="Buscar productos..."
@@ -265,7 +247,7 @@ const ListaProductos: React.FC = () => {
             {filteredProductos.map((producto) => (
               <tr key={producto.producto_key}>
                 <td>
-                  <span style={{ fontFamily: "monospace", color: "#718096" }}>{producto.producto_key}</span>
+                  <span className="id-badge">{producto.producto_key}</span>
                 </td>
                 <td>
                   {editingId === producto.producto_key ? (
@@ -276,7 +258,7 @@ const ListaProductos: React.FC = () => {
                       className="edit-input"
                     />
                   ) : (
-                    <span className="producto-name">🚙 {producto.nombre_producto}</span>
+                    <span className="producto-name">{producto.nombre_producto}</span>
                   )}
                 </td>
                 <td>
@@ -293,7 +275,7 @@ const ListaProductos: React.FC = () => {
                       ))}
                     </select>
                   ) : (
-                    <span className="modelo-badge">🚗 {getModeloNombre(producto.modelo_key)}</span>
+                    <span className="modelo-badge">{getModeloNombre(producto.modelo_key)}</span>
                   )}
                 </td>
                 <td>
@@ -310,7 +292,7 @@ const ListaProductos: React.FC = () => {
                       ))}
                     </select>
                   ) : (
-                    <span className="categoria-badge">🏷️ {getCategoriaNombre(producto.categoria_key)}</span>
+                    <span className="categoria-badge">{getCategoriaNombre(producto.categoria_key)}</span>
                   )}
                 </td>
                 <td>
@@ -324,7 +306,7 @@ const ListaProductos: React.FC = () => {
                       max={new Date().getFullYear() + 5}
                     />
                   ) : (
-                    <span className="year-badge">📅 {producto.ano_fabricacion}</span>
+                    <span className="year-badge">{producto.ano_fabricacion}</span>
                   )}
                 </td>
                 <td>
@@ -336,10 +318,7 @@ const ListaProductos: React.FC = () => {
                       className="edit-input"
                     />
                   ) : (
-                    <span className="color-badge">
-                      <span className="color-circle" style={{ backgroundColor: getColorStyle(producto.color) }}></span>
-                      🎨 {producto.color || "N/A"}
-                    </span>
+                    <span className="color-badge">{producto.color || "N/A"}</span>
                   )}
                 </td>
                 <td>
@@ -353,7 +332,7 @@ const ListaProductos: React.FC = () => {
                       step="0.01"
                     />
                   ) : (
-                    <span className="price-badge">💰 {formatPrice(producto.precio_lista)}</span>
+                    <span className="price-badge">{formatPrice(producto.precio_lista)}</span>
                   )}
                 </td>
                 <td>

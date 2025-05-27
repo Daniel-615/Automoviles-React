@@ -101,7 +101,7 @@ const Ventas: React.FC = () => {
 
       // Fetch clientes
       const clientesResponse = await fetch(
-        "https://autos-flask-umg-backend-ajbqcxhaaudjbdf0.mexicocentral-01.azurewebsites.net/ventas/get/cliente",
+        "https://autos-flask-umg-backend-ajbqcxhaaudjbdf0.mexicocentral-01.azurewebsites.net/ventas/get/cliente?per_page=100",
       )
 
       if (clientesResponse.ok) {
