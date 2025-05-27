@@ -1,0 +1,532 @@
+/* CONTENEDOR PRINCIPAL DE ESTADÍSTICAS */
+.tiendas-bi-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  padding: 2rem 1rem;
+  position: relative;
+  overflow: hidden;
+}
+
+/* EFECTO DE PARTÍCULAS DE FONDO */
+.tiendas-bi-container::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(255, 107, 107, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 40% 40%, rgba(66, 165, 245, 0.05) 0%, transparent 50%);
+  animation: float 20s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  33% {
+    transform: translateY(-20px) rotate(1deg);
+  }
+  66% {
+    transform: translateY(10px) rotate(-1deg);
+  }
+}
+
+/* CONTENEDOR INTERNO */
+.tiendas-bi-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 2;
+}
+
+/* HEADER PRINCIPAL */
+.tiendas-bi-header {
+  text-align: center;
+  margin-bottom: 3rem;
+  position: relative;
+}
+
+.tiendas-bi-title {
+  font-size: 3.5rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #ffffff 0%, #e3f2fd 50%, #bbdefb 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 1rem;
+  text-shadow: 0 4px 20px rgba(255, 255, 255, 0.1);
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.tiendas-bi-subtitle {
+  font-size: 1.3rem;
+  color: #b0bec5;
+  font-weight: 400;
+  margin-bottom: 2rem;
+  opacity: 0.9;
+}
+
+/* LÍNEA DECORATIVA */
+.tiendas-bi-header::after {
+  content: "";
+  position: absolute;
+  bottom: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 4px;
+  background: linear-gradient(90deg, #ff6b6b, #4ecdc4, #45b7d1);
+  border-radius: 2px;
+  animation: pulse-line 3s ease-in-out infinite;
+}
+
+@keyframes pulse-line {
+  0%,
+  100% {
+    opacity: 1;
+    transform: translateX(-50%) scaleX(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: translateX(-50%) scaleX(1.1);
+  }
+}
+
+/* CONTENEDOR DEL DASHBOARD */
+.dashboard-container {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 24px;
+  padding: 2.5rem;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3), 0 8px 32px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.dashboard-container:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.4), 0 12px 40px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+/* EFECTO DE BRILLO EN EL DASHBOARD */
+.dashboard-container::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+  animation: shine 4s infinite;
+  pointer-events: none;
+}
+
+@keyframes shine {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+/* CONTENEDOR DEL POWER BI - MEJORADO PARA MOSTRAR COMPLETO */
+.powerbi-wrapper {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #1a1a2e;
+  box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.3);
+  margin-bottom: 2rem;
+}
+
+.powerbi-iframe-container {
+  width: 100%;
+  position: relative;
+  margin-bottom: 2rem;
+}
+
+.powerbi-iframe-wrapper {
+  position: relative;
+  width: 100%;
+  /* Aspect ratio 16:9 para mejor visualización */
+  aspect-ratio: 16 / 9;
+  min-height: 800px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #1a1a2e;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.powerbi-iframe-wrapper iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+  border-radius: 12px;
+  /* Escala para ajustar mejor el contenido */
+  transform: scale(1);
+  transform-origin: top left;
+}
+
+/* ALTERNATIVA: Contenedor con altura fija más grande */
+.powerbi-iframe-wrapper.fixed-height {
+  height: 700px;
+  aspect-ratio: unset;
+}
+
+/* ALTERNATIVA: Contenedor responsive con padding */
+.powerbi-iframe-wrapper.responsive-padding {
+  padding-bottom: 56.25%; /* 16:9 aspect ratio */
+  height: 0;
+  min-height: 600px;
+}
+
+.powerbi-iframe-wrapper.responsive-padding iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* INDICADORES DE ESTADO */
+.status-indicators {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.8rem 1.5rem;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 50px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+}
+
+.status-indicator:hover {
+  background: rgba(255, 255, 255, 0.12);
+  transform: translateY(-2px);
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #4caf50;
+  animation: pulse-dot 2s infinite;
+}
+
+@keyframes pulse-dot {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.2);
+  }
+}
+
+.status-text {
+  color: #e0e0e0;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+/* INFORMACIÓN ADICIONAL */
+.dashboard-info {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.info-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 1.5rem;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.info-card:hover {
+  background: rgba(255, 255, 255, 0.08);
+  transform: translateY(-3px);
+}
+
+.info-card-title {
+  color: #b0bec5;
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.info-card-value {
+  color: #ffffff;
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.info-card-description {
+  color: #78909c;
+  font-size: 0.8rem;
+}
+
+/* BOTONES DE ACCIÓN */
+.dashboard-actions {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 2rem;
+  flex-wrap: wrap;
+}
+
+.action-btn {
+  padding: 0.8rem 2rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.action-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+}
+
+.action-btn::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.action-btn:hover::before {
+  left: 100%;
+}
+
+.action-btn.secondary {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+}
+
+.action-btn.secondary:hover {
+  box-shadow: 0 10px 30px rgba(255, 107, 107, 0.4);
+}
+
+/* RESPONSIVE DESIGN MEJORADO */
+@media (max-width: 1200px) {
+  .tiendas-bi-title {
+    font-size: 3rem;
+  }
+
+  .dashboard-container {
+    padding: 2rem;
+  }
+
+  .powerbi-iframe-wrapper {
+    min-height: 700px;
+  }
+}
+
+@media (max-width: 768px) {
+  .tiendas-bi-container {
+    padding: 1rem 0.5rem;
+  }
+
+  .tiendas-bi-title {
+    font-size: 2.5rem;
+  }
+
+  .tiendas-bi-subtitle {
+    font-size: 1.1rem;
+  }
+
+  .dashboard-container {
+    padding: 1.5rem;
+    border-radius: 16px;
+  }
+
+  .powerbi-iframe-wrapper {
+    min-height: 600px;
+  }
+
+  .status-indicators {
+    gap: 1rem;
+  }
+
+  .status-indicator {
+    padding: 0.6rem 1rem;
+    font-size: 0.8rem;
+  }
+
+  .dashboard-info {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .dashboard-actions {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .action-btn {
+    width: 100%;
+    max-width: 300px;
+  }
+}
+
+@media (max-width: 480px) {
+  .tiendas-bi-title {
+    font-size: 2rem;
+  }
+
+  .dashboard-container {
+    padding: 1rem;
+  }
+
+  .powerbi-iframe-wrapper {
+    min-height: 500px;
+  }
+
+  .info-card {
+    padding: 1rem;
+  }
+
+  .info-card-value {
+    font-size: 1.5rem;
+  }
+}
+
+/* ANIMACIONES DE ENTRADA */
+.tiendas-bi-container {
+  animation: fadeInUp 0.8s ease-out;
+}
+
+.dashboard-container {
+  animation: fadeInUp 0.8s ease-out 0.2s both;
+}
+
+.info-card {
+  animation: fadeInUp 0.6s ease-out both;
+}
+
+.info-card:nth-child(1) {
+  animation-delay: 0.3s;
+}
+.info-card:nth-child(2) {
+  animation-delay: 0.4s;
+}
+.info-card:nth-child(3) {
+  animation-delay: 0.5s;
+}
+.info-card:nth-child(4) {
+  animation-delay: 0.6s;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* EFECTOS DE LOADING */
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(26, 26, 46, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16px;
+  z-index: 10;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  border-top: 3px solid #667eea;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* MEJORAS DE ACCESIBILIDAD */
+.action-btn:focus,
+.status-indicator:focus {
+  outline: 2px solid #667eea;
+  outline-offset: 2px;
+}
+
+/* MODO ALTO CONTRASTE */
+@media (prefers-contrast: high) {
+  .tiendas-bi-container {
+    background: #000000;
+  }
+
+  .dashboard-container {
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid #ffffff;
+  }
+
+  .tiendas-bi-title {
+    color: #ffffff;
+    -webkit-text-fill-color: #ffffff;
+  }
+}
+
+/* MODO REDUCIR MOVIMIENTO */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
