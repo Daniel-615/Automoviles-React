@@ -23,7 +23,7 @@ import ListaClienteSegmento from "./pages/cliente_segmento/ListaClienteSegmento"
 import ListaVendedorTiendas from "./pages/vendedor_tienda/ListasVendedorTiendas"
 import ListaGerentes from "./pages/gerente/ListaGerentes"
 // Nuevas importaciones para el microservicio de ventas
-import Categoria from "./pages/categoria/categoria"
+import Categoria from "./pages/categoria/Categoria"
 import ListaCategorias from "./pages/categoria/ListaCategorias"
 import Fecha from "./pages/fecha/Fecha"
 import ListaFechas from "./pages/fecha/ListaFechas"
@@ -144,6 +144,7 @@ const HomePage = () => {
       const año = ahora.getFullYear().toString()
 
       // Para formato 12 horas si se prefiere
+      // @ts-ignore
       const hora12 = ahora.toLocaleTimeString("es-ES", {
         hour12: true,
         hour: "2-digit",
