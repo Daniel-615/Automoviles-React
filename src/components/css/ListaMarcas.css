@@ -1,48 +1,40 @@
-.marcas-page {
-  min-height: 100vh;
-  background: #f8fafc;
-  padding: 2rem 0;
-}
-
-.marcas-container {
+.lista-marcas-container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 1rem;
+  padding: 2rem;
+  background: #f8f9fa;
+  min-height: 100vh;
 }
 
-.marcas-header {
+/* Header */
+.lista-header {
   background: white;
-  border-radius: 16px;
+  border-radius: 12px;
   padding: 2rem;
   margin-bottom: 2rem;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  border: 1px solid #e2e8f0;
-}
-
-.header-content {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 2rem;
 }
 
-.marcas-title {
-  font-size: 2.2rem;
+.lista-header h1 {
+  font-size: 2.5rem;
   font-weight: 700;
-  color: #2563eb;
+  color: #007bff;
   margin: 0;
   position: relative;
   display: inline-block;
 }
 
-.marcas-title::after {
+.lista-header h1::after {
   content: "";
   position: absolute;
   bottom: -8px;
   left: 0;
-  width: 60px;
+  width: 80px;
   height: 4px;
-  background: #2563eb;
+  background: #007bff;
   border-radius: 2px;
 }
 
@@ -62,142 +54,39 @@
   position: absolute;
   left: 1rem;
   font-size: 1.2rem;
-  color: #6b7280;
+  color: #6c757d;
   z-index: 1;
 }
 
 .search-input {
   padding: 0.75rem 1rem 0.75rem 3rem;
-  border: 2px solid #e2e8f0;
+  border: 1px solid #ddd;
   border-radius: 8px;
   font-size: 1rem;
   width: 300px;
   background: #ffffff;
-  color: #374151;
+  color: #333;
   transition: all 0.2s ease;
 }
 
 .search-input:focus {
   outline: none;
-  border-color: #2563eb;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
 }
 
 .search-input::placeholder {
-  color: #9ca3af;
+  color: #999;
   font-style: italic;
 }
 
-.btn {
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  font-weight: 600;
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  border: none;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  text-decoration: none;
-  justify-content: center;
-}
-
-.btn-primary {
-  background: #2563eb;
-  color: white;
-  box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.3);
-}
-
-.btn-primary:hover {
-  background: #1d4ed8;
-  transform: translateY(-1px);
-  box-shadow: 0 6px 12px -1px rgba(37, 99, 235, 0.4);
-}
-
-.btn-icon {
-  font-size: 1.1rem;
-}
-
-/* Stats */
-.stats-container {
-  display: flex;
-  gap: 1rem;
-  margin-bottom: 2rem;
-}
-
-.stat-card {
-  background: white;
-  border-radius: 12px;
-  padding: 1.5rem;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  border: 1px solid #e2e8f0;
-  text-align: center;
-  min-width: 120px;
-}
-
-.stat-number {
-  font-size: 2rem;
-  font-weight: 700;
-  color: #2563eb;
-  display: block;
-  line-height: 1;
-}
-
-.stat-label {
-  font-size: 0.9rem;
-  color: #64748b;
-  margin-top: 0.5rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-/* Alert */
-.alert {
-  background: #fef2f2;
-  border: 1px solid #fecaca;
-  color: #dc2626;
-  border-radius: 8px;
-  padding: 1rem 1.5rem;
-  margin-bottom: 2rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.alert-error {
-  background: #fef2f2;
-  border-color: #fecaca;
-  color: #dc2626;
-}
-
-.alert-icon {
-  font-size: 1.2rem;
-  margin-right: 0.5rem;
-}
-
-.retry-btn {
-  background: #dc2626;
-  color: white;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  transition: all 0.2s ease;
-}
-
-.retry-btn:hover {
-  background: #b91c1c;
-}
-
-/* Table */
+/* Table Container */
 .table-container {
   background: white;
-  border-radius: 16px;
+  border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
 }
 
 .marcas-table {
@@ -206,69 +95,40 @@
 }
 
 .marcas-table th {
-  background: #2563eb;
+  background: #007bff;
   color: white;
   padding: 1rem;
   text-align: left;
   font-weight: 600;
   font-size: 0.9rem;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.5px;
 }
 
 .marcas-table td {
   padding: 1rem;
-  border-bottom: 1px solid #e2e8f0;
-  color: #374151;
-  vertical-align: top;
+  border-bottom: 1px solid #e9ecef;
+  color: #333;
+  vertical-align: middle;
 }
 
 .marcas-table tr:hover {
-  background-color: #f8fafc;
+  background-color: #f8f9fa;
 }
 
 .marcas-table tr:last-child td {
   border-bottom: none;
 }
 
-.id-badge {
-  background: #e0e7ff;
-  color: #3730a3;
-  padding: 0.25rem 0.75rem;
-  border-radius: 1rem;
-  font-weight: 600;
-  font-size: 0.8rem;
-}
-
 .marca-name {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-weight: 600;
-  color: #1e293b;
+  font-weight: 500;
+  color: #333;
 }
 
-.name-icon {
-  font-size: 1rem;
-}
-
-.pais-origen {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  color: #475569;
-}
-
-.flag-icon {
-  font-size: 1rem;
-}
-
-.descripcion {
-  color: #64748b;
-  line-height: 1.4;
-  max-width: 300px;
-}
-
+/* Action Buttons */
 .action-buttons {
   display: flex;
   gap: 0.5rem;
@@ -283,7 +143,7 @@
   border: none;
   border-radius: 6px;
   cursor: pointer;
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   font-weight: 500;
   transition: all 0.2s ease;
   display: flex;
@@ -292,95 +152,98 @@
 }
 
 .edit-btn {
-  background: #dcfce7;
-  color: #166534;
-  border: 1px solid #bbf7d0;
+  background: #28a745;
+  color: white;
 }
 
 .edit-btn:hover {
-  background: #bbf7d0;
+  background: #218838;
 }
 
 .delete-btn {
-  background: #fef2f2;
-  color: #dc2626;
-  border: 1px solid #fecaca;
+  background: #dc3545;
+  color: white;
 }
 
 .delete-btn:hover {
-  background: #fecaca;
+  background: #c82333;
 }
 
 .save-btn {
-  background: #dcfce7;
-  color: #166534;
-  border: 1px solid #bbf7d0;
+  background: #28a745;
+  color: white;
 }
 
 .save-btn:hover {
-  background: #bbf7d0;
+  background: #218838;
 }
 
 .cancel-btn {
-  background: #f1f5f9;
-  color: #475569;
-  border: 1px solid #cbd5e1;
+  background: #6c757d;
+  color: white;
 }
 
 .cancel-btn:hover {
-  background: #e2e8f0;
+  background: #5a6268;
 }
 
-.edit-input,
-.edit-textarea {
+.edit-input {
   width: 100%;
   padding: 0.5rem;
-  border: 1px solid #d1d5db;
+  border: 1px solid #ddd;
   border-radius: 4px;
   font-size: 0.9rem;
-  color: #374151;
+  color: #333;
   background: #ffffff;
 }
 
-.edit-input:focus,
-.edit-textarea:focus {
+.edit-input:focus {
   outline: none;
-  border-color: #2563eb;
-  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
 }
 
-.edit-textarea {
-  min-height: 60px;
-  resize: vertical;
-  font-family: inherit;
+/* Pagination */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* Empty State */
-.empty-state {
-  text-align: center;
-  padding: 4rem 2rem;
-}
-
-.empty-icon {
-  font-size: 4rem;
-  margin-bottom: 1rem;
-  opacity: 0.3;
-}
-
-.empty-title {
-  font-size: 1.5rem;
+.pagination-btn {
+  padding: 0.75rem 1.5rem;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
   font-weight: 600;
-  margin: 0 0 1rem 0;
-  color: #374151;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
-.empty-description {
-  color: #6b7280;
-  margin: 0 0 2rem 0;
-  max-width: 400px;
-  margin-left: auto;
-  margin-right: auto;
-  line-height: 1.6;
+.pagination-btn:hover:not(:disabled) {
+  background: #0056b3;
+  transform: translateY(-1px);
+}
+
+.pagination-btn:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.pagination-info {
+  font-weight: 600;
+  color: #333;
+  font-size: 1rem;
 }
 
 /* Loading */
@@ -391,20 +254,62 @@
   justify-content: center;
   min-height: 60vh;
   gap: 1rem;
+  background: #f8f9fa;
 }
 
-.loading-container .loading-spinner {
+.loading-spinner {
   width: 2rem;
   height: 2rem;
-  border: 3px solid #e2e8f0;
-  border-top: 3px solid #2563eb;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #007bff;
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
 
 .loading-container p {
-  color: #64748b;
+  color: #6c757d;
   font-size: 1.1rem;
+}
+
+/* Error */
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  gap: 1rem;
+  background: #f8f9fa;
+  text-align: center;
+}
+
+.error-icon {
+  font-size: 3rem;
+}
+
+.error-container p {
+  color: #dc3545;
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+.retry-btn {
+  background: #dc3545;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.retry-btn:hover {
+  background: #c82333;
+  transform: translateY(-1px);
 }
 
 @keyframes spin {
@@ -418,29 +323,23 @@
 
 /* Responsive Design */
 @media (max-width: 768px) {
-  .marcas-page {
-    padding: 1rem 0;
+  .lista-marcas-container {
+    padding: 1rem;
   }
 
-  .marcas-container {
-    padding: 0 0.5rem;
-  }
-
-  .marcas-header {
+  .lista-header {
+    flex-direction: column;
+    gap: 1rem;
     padding: 1.5rem;
   }
 
-  .header-content {
-    flex-direction: column;
-    gap: 1rem;
+  .lista-header h1 {
+    font-size: 2rem;
+    text-align: center;
   }
 
   .search-input {
     width: 100%;
-  }
-
-  .stats-container {
-    flex-direction: column;
   }
 
   .table-container {
@@ -448,24 +347,30 @@
   }
 
   .marcas-table {
-    min-width: 600px;
+    min-width: 500px;
   }
 
   .action-buttons {
     flex-direction: column;
   }
+
+  .pagination {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
 }
 
 @media (max-width: 480px) {
-  .marcas-title {
-    font-size: 1.8rem;
+  .lista-header h1 {
+    font-size: 1.75rem;
   }
 
-  .marcas-header {
+  .lista-header {
     padding: 1rem;
   }
 
-  .stat-card {
-    padding: 1rem;
+  .marcas-table th,
+  .marcas-table td {
+    padding: 0.75rem 0.5rem;
   }
 }
