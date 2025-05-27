@@ -2,6 +2,7 @@
 
 import type React from "react"
 import { useState, useEffect } from "react"
+import { useNavigate } from "react-router-dom"
 import "../../components/css/ListaCategorias.css"
 
 interface CategoriaItem {
@@ -11,107 +12,98 @@ interface CategoriaItem {
   categoria_padre: string
 }
 
-interface ApiResponse {
+interface PaginationResponse {
   categorias: CategoriaItem[]
   total: number
   pagina_actual: number
   total_paginas: number
+  elementos_por_pagina: number
 }
 
 const ListaCategorias: React.FC = () => {
   const [categorias, setCategorias] = useState<CategoriaItem[]>([])
   const [loading, setLoading] = useState(true)
+  const [loadingPagina, setLoadingPagina] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [currentPage, setCurrentPage] = useState(1)
-  const [totalPages, setTotalPages] = useState(1)
+  const [paginaActual, setPaginaActual] = useState(1)
+  const [totalElementos, setTotalElementos] = useState(0)
+  const [totalPaginas, setTotalPaginas] = useState(1)
   const [searchTerm, setSearchTerm] = useState("")
-  const [editingId, setEditingId] = useState<number | null>(null)
-  const [editData, setEditData] = useState<Partial<CategoriaItem>>({})
+  const elementosPorPagina = 6
+  const navigate = useNavigate()
 
   const fetchCategorias = async (page = 1) => {
     try {
-      setLoading(true)
+      if (page === 1) {
+        setLoading(true)
+      } else {
+        setLoadingPagina(true)
+      }
+
+      console.log(`📄 Cargando página ${page}: /get/categorias?page=${page}&per_page=${elementosPorPagina}`)
+
       const response = await fetch(
-        `https://cubosolap-cngzccemejb8g7b9.mexicocentral-01.azurewebsites.net/ventas/get/categorias?page=${page}&per_page=10`,
+        `https://cubosolap-cngzccemejb8g7b9.mexicocentral-01.azurewebsites.net/ventas/get/categorias?page=${page}&per_page=${elementosPorPagina}`,
       )
 
       if (!response.ok) {
         throw new Error("Error al cargar las categorías")
       }
 
-      const data: ApiResponse = await response.json()
-      setCategorias(data.categorias)
-      setCurrentPage(data.pagina_actual)
-      setTotalPages(data.total_paginas)
+      const data: PaginationResponse = await response.json()
+      console.log("📊 Respuesta del API:", data)
+
+      // Extraer datos de diferentes estructuras posibles
+      const categoriasData = data.categorias || data
+      const total = data.total || categoriasData.length
+      const totalPags = data.total_paginas || Math.ceil(total / elementosPorPagina)
+
+      setCategorias(Array.isArray(categoriasData) ? categoriasData : [])
+      setTotalElementos(total)
+      setTotalPaginas(totalPags)
+      setPaginaActual(page)
+
+      console.log(`✅ Cargadas ${categoriasData.length} categorías de ${total} totales`)
     } catch (err) {
+      console.error("❌ Error al cargar categorías:", err)
       setError(err instanceof Error ? err.message : "Error desconocido")
     } finally {
       setLoading(false)
+      setLoadingPagina(false)
     }
   }
 
   useEffect(() => {
-    fetchCategorias(currentPage)
-  }, [currentPage])
+    fetchCategorias(paginaActual)
+  }, [paginaActual])
 
-  const handleEdit = (categoria: CategoriaItem) => {
-    setEditingId(categoria.categoria_key)
-    setEditData(categoria)
-  }
-
-  const handleSave = async () => {
-    if (!editingId) return
-
-    try {
-      const response = await fetch(
-        `https://cubosolap-cngzccemejb8g7b9.mexicocentral-01.azurewebsites.net/ventas/put/categoria/${editingId}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(editData),
-        },
-      )
-
-      if (response.ok) {
-        await fetchCategorias(currentPage)
-        setEditingId(null)
-        setEditData({})
-      } else {
-        throw new Error("Error al actualizar la categoría")
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Error al actualizar")
+  const cambiarPagina = (nuevaPagina: number) => {
+    if (nuevaPagina >= 1 && nuevaPagina <= totalPaginas && nuevaPagina !== paginaActual) {
+      setPaginaActual(nuevaPagina)
+      // Scroll suave al top
+      window.scrollTo({ top: 0, behavior: "smooth" })
     }
   }
 
-  const handleDelete = async (id: number) => {
-    if (!window.confirm("¿Estás seguro de que quieres eliminar esta categoría?")) {
-      return
+  const generarNumerosPagina = () => {
+    const numeros: number[] = []
+    const maxVisible = 5
+    let inicio = Math.max(1, paginaActual - Math.floor(maxVisible / 2))
+    const fin = Math.min(totalPaginas, inicio + maxVisible - 1)
+
+    if (fin - inicio + 1 < maxVisible) {
+      inicio = Math.max(1, fin - maxVisible + 1)
     }
 
-    try {
-      const response = await fetch(
-        `https://cubosolap-cngzccemejb8g7b9.mexicocentral-01.azurewebsites.net/ventas/delete/categoria/${id}`,
-        {
-          method: "DELETE",
-        },
-      )
-
-      if (response.ok) {
-        await fetchCategorias(currentPage)
-      } else {
-        throw new Error("Error al eliminar la categoría")
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Error al eliminar")
+    for (let i = inicio; i <= fin; i++) {
+      numeros.push(i)
     }
+    return numeros
   }
 
   const filteredCategorias = categorias.filter(
     (categoria) =>
-      categoria.nombre_categoria.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      categoria.nombre_categoria?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       categoria.descripcion?.toLowerCase().includes(searchTerm.toLowerCase()),
   )
 
@@ -129,129 +121,117 @@ const ListaCategorias: React.FC = () => {
       <div className="error-container">
         <span className="error-icon">❌</span>
         <p>{error}</p>
-        <button onClick={() => fetchCategorias(currentPage)} className="retry-btn">
+        <button onClick={() => fetchCategorias(paginaActual)} className="retry-btn">
           Reintentar
         </button>
       </div>
     )
   }
 
+  const inicioElementos = (paginaActual - 1) * elementosPorPagina + 1
+  const finElementos = Math.min(paginaActual * elementosPorPagina, totalElementos)
+
   return (
-    <div className="lista-categorias-container">
+    <div className="lista-container">
       <div className="lista-header">
-        <h1>Lista de Categorías</h1>
-        <div className="header-actions">
-          <div className="search-container">
-            <span className="search-icon">🔍</span>
-            <input
-              type="text"
-              placeholder="Buscar categorías..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="search-input"
-            />
-          </div>
+        <h1>📂 Lista de Categorías</h1>
+        <div className="header-info">
+          <span>
+            Total de categorías: {totalElementos} • Página {paginaActual} de {totalPaginas}
+          </span>
         </div>
+        <button className="btn-volver" onClick={() => navigate("/categoria")}>
+          ← Volver a Gestión
+        </button>
       </div>
 
-      <div className="table-container">
-        <table className="categorias-table">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Nombre</th>
-              <th>Descripción</th>
-              <th>Categoría Padre</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredCategorias.map((categoria) => (
-              <tr key={categoria.categoria_key}>
-                <td>{categoria.categoria_key}</td>
-                <td>
-                  {editingId === categoria.categoria_key ? (
-                    <input
-                      type="text"
-                      value={editData.nombre_categoria || ""}
-                      onChange={(e) => setEditData({ ...editData, nombre_categoria: e.target.value })}
-                      className="edit-input"
-                    />
-                  ) : (
-                    categoria.nombre_categoria
-                  )}
-                </td>
-                <td>
-                  {editingId === categoria.categoria_key ? (
-                    <textarea
-                      value={editData.descripcion || ""}
-                      onChange={(e) => setEditData({ ...editData, descripcion: e.target.value })}
-                      className="edit-textarea"
-                    />
-                  ) : (
-                    categoria.descripcion || "N/A"
-                  )}
-                </td>
-                <td>
-                  {editingId === categoria.categoria_key ? (
-                    <input
-                      type="text"
-                      value={editData.categoria_padre || ""}
-                      onChange={(e) => setEditData({ ...editData, categoria_padre: e.target.value })}
-                      className="edit-input"
-                    />
-                  ) : (
-                    categoria.categoria_padre || "N/A"
-                  )}
-                </td>
-                <td>
-                  <div className="action-buttons">
-                    {editingId === categoria.categoria_key ? (
-                      <>
-                        <button onClick={handleSave} className="save-btn">
-                          Guardar
-                        </button>
-                        <button onClick={() => setEditingId(null)} className="cancel-btn">
-                          Cancelar
-                        </button>
-                      </>
-                    ) : (
-                      <>
-                        <button onClick={() => handleEdit(categoria)} className="edit-btn">
-                          Editar
-                        </button>
-                        <button onClick={() => handleDelete(categoria.categoria_key)} className="delete-btn">
-                          Eliminar
-                        </button>
-                      </>
-                    )}
-                  </div>
-                </td>
-              </tr>
+      <div className="search-container">
+        <span className="search-icon">🔍</span>
+        <input
+          type="text"
+          placeholder="Buscar categorías..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="search-input"
+        />
+      </div>
+
+      {filteredCategorias.length === 0 ? (
+        <p className="mensaje-vacio">No hay categorías registradas.</p>
+      ) : (
+        <>
+          <div className="elementos-info">
+            Mostrando {inicioElementos}-{finElementos} de {totalElementos} categorías
+          </div>
+
+          <div
+            className={`tarjetas-vendedores ${loadingPagina ? "loading" : ""}`}
+            style={{ opacity: loadingPagina ? 0.6 : 1 }}
+          >
+            {filteredCategorias.map((categoria, index) => (
+              <div
+                className="tarjeta"
+                key={categoria.categoria_key}
+                onClick={() => navigate(`/categoria/${categoria.categoria_key}`)}
+                style={{
+                  cursor: "pointer",
+                  animationDelay: `${index * 0.1}s`,
+                }}
+              >
+                <h3>📂 {categoria.nombre_categoria}</h3>
+                <div className="categoria-info">
+                  <p>
+                    <strong>ID:</strong> {categoria.categoria_key}
+                  </p>
+                  <p>
+                    <strong>Descripción:</strong> {categoria.descripcion || "Sin descripción"}
+                  </p>
+                  <p>
+                    <strong>Categoría Padre:</strong> {categoria.categoria_padre || "Ninguna"}
+                  </p>
+                </div>
+              </div>
             ))}
-          </tbody>
-        </table>
-      </div>
+          </div>
 
-      <div className="pagination">
-        <button
-          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-          disabled={currentPage === 1}
-          className="pagination-btn"
-        >
-          ⬅️ Anterior
-        </button>
-        <span className="pagination-info">
-          Página {currentPage} de {totalPages}
-        </span>
-        <button
-          onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-          disabled={currentPage === totalPages}
-          className="pagination-btn"
-        >
-          Siguiente ➡️
-        </button>
-      </div>
+          {totalPaginas > 1 && (
+            <div className="pagination">
+              <button
+                onClick={() => cambiarPagina(paginaActual - 1)}
+                disabled={paginaActual === 1 || loadingPagina}
+                className="pagination-btn"
+              >
+                ⬅️ Anterior
+              </button>
+
+              <div className="pagination-numbers">
+                {generarNumerosPagina().map((numero) => (
+                  <button
+                    key={numero}
+                    onClick={() => cambiarPagina(numero)}
+                    disabled={loadingPagina}
+                    className={`pagination-number ${numero === paginaActual ? "active" : ""}`}
+                  >
+                    {numero}
+                  </button>
+                ))}
+              </div>
+
+              <button
+                onClick={() => cambiarPagina(paginaActual + 1)}
+                disabled={paginaActual === totalPaginas || loadingPagina}
+                className="pagination-btn"
+              >
+                Siguiente ➡️
+              </button>
+            </div>
+          )}
+
+          <div className="pagination-info">
+            Página {paginaActual} de {totalPaginas} • {totalElementos} categorías en total
+          </div>
+        </>
+      )}
     </div>
   )
 }
