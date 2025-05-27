@@ -171,131 +171,144 @@ const ListaModelos: React.FC = () => {
   }
 
   return (
-    <div className="lista-modelos-container">
-      <div className="lista-header">
-        <h1>🚗 Lista de Modelos</h1>
-        <div className="header-actions">
-          <div className="search-container">
-            <input
-              type="text"
-              placeholder="Buscar modelos..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="search-input"
-            />
-            <span className="search-icon">🔍</span>
+    <div className="lista-modelos-page">
+      <div className="lista-modelos-container">
+        <div className="header-card">
+          <div className="header-content">
+            <div className="title-section">
+              <span className="car-icon">🚗</span>
+              <h1 className="page-title">Lista de Modelos</h1>
+            </div>
+            <div className="header-actions">
+              <div className="search-container">
+                <span className="search-icon">🔍</span>
+                <input
+                  type="text"
+                  placeholder="Buscar modelos..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="search-input"
+                />
+              </div>
+              <button onClick={handleNavigateToCreate} className="create-btn">
+                ➕ Crear Modelo
+              </button>
+            </div>
           </div>
-          <button onClick={handleNavigateToCreate} className="retry-btn">
-            ➕ Crear Modelo
+        </div>
+
+        <div className="table-card">
+          <table className="modelos-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>NOMBRE DEL MODELO</th>
+                <th>AÑO LANZAMIENTO</th>
+                <th>MARCA</th>
+                <th>ACCIONES</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredModelos.map((modelo) => (
+                <tr key={modelo.modelo_key}>
+                  <td>{modelo.modelo_key}</td>
+                  <td>
+                    {editingId === modelo.modelo_key ? (
+                      <input
+                        type="text"
+                        value={editData.nombre_modelo || ""}
+                        onChange={(e) => setEditData({ ...editData, nombre_modelo: e.target.value })}
+                        className="edit-input"
+                      />
+                    ) : (
+                      <div className="modelo-info">
+                        <span className="modelo-icon">🚗</span>
+                        <span className="modelo-name">{modelo.nombre_modelo}</span>
+                      </div>
+                    )}
+                  </td>
+                  <td>
+                    {editingId === modelo.modelo_key ? (
+                      <input
+                        type="number"
+                        value={editData.ano_lanzamiento || ""}
+                        onChange={(e) => setEditData({ ...editData, ano_lanzamiento: Number.parseInt(e.target.value) })}
+                        className="edit-input"
+                        min="1900"
+                        max={new Date().getFullYear() + 5}
+                      />
+                    ) : (
+                      <span className="year-badge">{modelo.ano_lanzamiento}</span>
+                    )}
+                  </td>
+                  <td>
+                    {editingId === modelo.modelo_key ? (
+                      <select
+                        value={editData.marca_key || ""}
+                        onChange={(e) => setEditData({ ...editData, marca_key: Number.parseInt(e.target.value) })}
+                        className="edit-select"
+                      >
+                        {marcas.map((marca) => (
+                          <option key={marca.marca_key} value={marca.marca_key}>
+                            {marca.nombre_marca}
+                          </option>
+                        ))}
+                      </select>
+                    ) : (
+                      <div className="marca-info">
+                        <span className="marca-icon">🏭</span>
+                        <span className="marca-name">{getMarcaNombre(modelo.marca_key)}</span>
+                      </div>
+                    )}
+                  </td>
+                  <td>
+                    <div className="action-buttons">
+                      {editingId === modelo.modelo_key ? (
+                        <>
+                          <button onClick={handleSave} className="save-btn">
+                            GUARDAR
+                          </button>
+                          <button onClick={() => setEditingId(null)} className="cancel-btn">
+                            CANCELAR
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          <button onClick={() => handleEdit(modelo)} className="edit-btn">
+                            ✏️ EDITAR
+                          </button>
+                          <button onClick={() => handleDelete(modelo.modelo_key)} className="delete-btn">
+                            🗑️ ELIMINAR
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <div className="pagination-card">
+          <button
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+            className="pagination-btn prev-btn"
+          >
+            ← Anterior
+          </button>
+          <span className="pagination-info">
+            Página {currentPage} de {totalPages}
+          </span>
+          <button
+            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+            disabled={currentPage === totalPages}
+            className="pagination-btn next-btn"
+          >
+            Siguiente →
           </button>
         </div>
-      </div>
-
-      <div className="table-container">
-        <table className="modelos-table">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Nombre del Modelo</th>
-              <th>Año Lanzamiento</th>
-              <th>Marca</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredModelos.map((modelo) => (
-              <tr key={modelo.modelo_key}>
-                <td>{modelo.modelo_key}</td>
-                <td>
-                  {editingId === modelo.modelo_key ? (
-                    <input
-                      type="text"
-                      value={editData.nombre_modelo || ""}
-                      onChange={(e) => setEditData({ ...editData, nombre_modelo: e.target.value })}
-                      className="edit-input"
-                    />
-                  ) : (
-                    <span className="modelo-name">🚗 {modelo.nombre_modelo}</span>
-                  )}
-                </td>
-                <td>
-                  {editingId === modelo.modelo_key ? (
-                    <input
-                      type="number"
-                      value={editData.ano_lanzamiento || ""}
-                      onChange={(e) => setEditData({ ...editData, ano_lanzamiento: Number.parseInt(e.target.value) })}
-                      className="edit-input"
-                      min="1900"
-                      max={new Date().getFullYear() + 5}
-                    />
-                  ) : (
-                    <span className="year-badge">📅 {modelo.ano_lanzamiento}</span>
-                  )}
-                </td>
-                <td>
-                  {editingId === modelo.modelo_key ? (
-                    <select
-                      value={editData.marca_key || ""}
-                      onChange={(e) => setEditData({ ...editData, marca_key: Number.parseInt(e.target.value) })}
-                      className="edit-select"
-                    >
-                      {marcas.map((marca) => (
-                        <option key={marca.marca_key} value={marca.marca_key}>
-                          {marca.nombre_marca}
-                        </option>
-                      ))}
-                    </select>
-                  ) : (
-                    <span className="marca-badge">🏭 {getMarcaNombre(modelo.marca_key)}</span>
-                  )}
-                </td>
-                <td>
-                  <div className="action-buttons">
-                    {editingId === modelo.modelo_key ? (
-                      <>
-                        <button onClick={handleSave} className="save-btn">
-                          💾 Guardar
-                        </button>
-                        <button onClick={() => setEditingId(null)} className="cancel-btn">
-                          ❌ Cancelar
-                        </button>
-                      </>
-                    ) : (
-                      <>
-                        <button onClick={() => handleEdit(modelo)} className="edit-btn">
-                          ✏️ Editar
-                        </button>
-                        <button onClick={() => handleDelete(modelo.modelo_key)} className="delete-btn">
-                          🗑️ Eliminar
-                        </button>
-                      </>
-                    )}
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      <div className="pagination">
-        <button
-          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-          disabled={currentPage === 1}
-          className="pagination-btn"
-        >
-          ⬅️ Anterior
-        </button>
-        <span className="pagination-info">
-          Página {currentPage} de {totalPages}
-        </span>
-        <button
-          onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-          disabled={currentPage === totalPages}
-          className="pagination-btn"
-        >
-          Siguiente ➡️
-        </button>
       </div>
     </div>
   )

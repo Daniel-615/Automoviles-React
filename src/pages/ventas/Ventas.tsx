@@ -2,7 +2,7 @@
 
 import type React from "react"
 import { useState, useEffect } from "react"
-import '../../components/css/ventas.css'
+import "../../components/css/ventas.css"
 
 interface VentasData {
   fecha_key: number
@@ -26,6 +26,29 @@ interface ProductoItem {
   nombre_producto: string
 }
 
+interface ClienteItem {
+  cliente_key: string
+  nombre: string
+  apellido: string
+  email: string
+  telefono: string
+}
+
+interface TiendaItem {
+  tienda_key: string
+  nombre_tienda: string
+  direccion: string
+  ciudad: string
+}
+
+interface VendedorItem {
+  vendedor_key: string
+  nombre: string
+  edad: number
+  salario: number
+  activo: boolean
+}
+
 const Ventas: React.FC = () => {
   const [formData, setFormData] = useState<VentasData>({
     fecha_key: 0,
@@ -41,6 +64,9 @@ const Ventas: React.FC = () => {
 
   const [fechas, setFechas] = useState<FechaItem[]>([])
   const [productos, setProductos] = useState<ProductoItem[]>([])
+  const [clientes, setClientes] = useState<ClienteItem[]>([])
+  const [tiendas, setTiendas] = useState<TiendaItem[]>([])
+  const [vendedores, setVendedores] = useState<VendedorItem[]>([])
   const [loading, setLoading] = useState(false)
   const [loadingData, setLoadingData] = useState(true)
   const [message, setMessage] = useState<{ text: string; type: "success" | "error" } | null>(null)
@@ -71,6 +97,36 @@ const Ventas: React.FC = () => {
       if (productosResponse.ok) {
         const productosData = await productosResponse.json()
         setProductos(productosData.productos || [])
+      }
+
+      // Fetch clientes
+      const clientesResponse = await fetch(
+        "https://autos-flask-umg-backend-ajbqcxhaaudjbdf0.mexicocentral-01.azurewebsites.net/ventas/get/cliente",
+      )
+
+      if (clientesResponse.ok) {
+        const clientesData = await clientesResponse.json()
+        setClientes(clientesData.clientes || [])
+      }
+
+      // Fetch tiendas
+      const tiendasResponse = await fetch(
+        "https://autos-flask-umg-backend-ajbqcxhaaudjbdf0.mexicocentral-01.azurewebsites.net/ventas/get/tienda",
+      )
+
+      if (tiendasResponse.ok) {
+        const tiendasData = await tiendasResponse.json()
+        setTiendas(tiendasData.tiendas || [])
+      }
+
+      // Fetch vendedores
+      const vendedoresResponse = await fetch(
+        "https://autos-flask-umg-backend-ajbqcxhaaudjbdf0.mexicocentral-01.azurewebsites.net/ventas/get/vendedor",
+      )
+
+      if (vendedoresResponse.ok) {
+        const vendedoresData = await vendedoresResponse.json()
+        setVendedores(vendedoresData.vendedores || [])
       }
     } catch (error) {
       console.error("Error al cargar datos:", error)
@@ -103,7 +159,7 @@ const Ventas: React.FC = () => {
     }
 
     if (!formData.cliente_key || !formData.tienda_key || !formData.vendedor_key) {
-      setMessage({ text: "Por favor completa todos los campos de UUID", type: "error" })
+      setMessage({ text: "Por favor selecciona cliente, tienda y vendedor", type: "error" })
       setLoading(false)
       return
     }
@@ -148,197 +204,227 @@ const Ventas: React.FC = () => {
   return (
     <div className="ventas-container">
       <div className="ventas-header">
-        <h1>💰 Registro de Ventas</h1>
-        <p>Administra las transacciones de venta del sistema</p>
+        <h1 className="ventas-title">🚗 Registro de Ventas</h1>
+        <p className="ventas-subtitle">Administra las transacciones de venta del sistema</p>
       </div>
 
-      <div className="ventas-form-container">
+      <div className="ventas-card">
         <form onSubmit={handleSubmit} className="ventas-form">
-          <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="fecha_key">
-                <span className="label-icon">📅</span>
-                Fecha *
-              </label>
-              {loadingData ? (
-                <div className="loading-select">
-                  <span className="loading-spinner"></span>
-                  Cargando fechas...
-                </div>
-              ) : (
-                <select
-                  id="fecha_key"
-                  name="fecha_key"
-                  value={formData.fecha_key}
+          {/* Sección Principal */}
+          <div className="form-section">
+            <h3 className="section-title">📋 Información Principal</h3>
+
+            <div className="form-row">
+              <div className="form-group">
+                <label htmlFor="fecha_key">📅 Fecha *</label>
+                {loadingData ? (
+                  <div className="loading-select">
+                    <div className="spinner"></div>
+                    Cargando fechas...
+                  </div>
+                ) : (
+                  <select
+                    id="fecha_key"
+                    name="fecha_key"
+                    value={formData.fecha_key}
+                    onChange={handleInputChange}
+                    required
+                  >
+                    <option value={0}>Selecciona una fecha</option>
+                    {fechas.map((fecha) => (
+                      <option key={fecha.fecha_key} value={fecha.fecha_key}>
+                        {fecha.fecha_completa}
+                      </option>
+                    ))}
+                  </select>
+                )}
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="producto_key">🚙 Producto *</label>
+                {loadingData ? (
+                  <div className="loading-select">
+                    <div className="spinner"></div>
+                    Cargando productos...
+                  </div>
+                ) : (
+                  <select
+                    id="producto_key"
+                    name="producto_key"
+                    value={formData.producto_key}
+                    onChange={handleInputChange}
+                    required
+                  >
+                    <option value={0}>Selecciona un producto</option>
+                    {productos.map((producto) => (
+                      <option key={producto.producto_key} value={producto.producto_key}>
+                        {producto.nombre_producto}
+                      </option>
+                    ))}
+                  </select>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Sección Detalles */}
+          <div className="form-section">
+            <h3 className="section-title">💰 Detalles de Venta</h3>
+
+            <div className="form-row">
+              <div className="form-group">
+                <label htmlFor="cantidad_vendida">📊 Cantidad Vendida *</label>
+                <input
+                  type="number"
+                  id="cantidad_vendida"
+                  name="cantidad_vendida"
+                  value={formData.cantidad_vendida}
                   onChange={handleInputChange}
                   required
-                >
-                  <option value={0}>Selecciona una fecha</option>
-                  {fechas.map((fecha) => (
-                    <option key={fecha.fecha_key} value={fecha.fecha_key}>
-                      {fecha.fecha_completa}
-                    </option>
-                  ))}
-                </select>
-              )}
-            </div>
+                  min="1"
+                />
+              </div>
 
-            <div className="form-group">
-              <label htmlFor="producto_key">
-                <span className="label-icon">🚙</span>
-                Producto *
-              </label>
-              {loadingData ? (
-                <div className="loading-select">
-                  <span className="loading-spinner"></span>
-                  Cargando productos...
-                </div>
-              ) : (
-                <select
-                  id="producto_key"
-                  name="producto_key"
-                  value={formData.producto_key}
+              <div className="form-group">
+                <label htmlFor="precio_unitario">💵 Precio Unitario *</label>
+                <input
+                  type="number"
+                  id="precio_unitario"
+                  name="precio_unitario"
+                  value={formData.precio_unitario}
                   onChange={handleInputChange}
                   required
-                >
-                  <option value={0}>Selecciona un producto</option>
-                  {productos.map((producto) => (
-                    <option key={producto.producto_key} value={producto.producto_key}>
-                      {producto.nombre_producto}
-                    </option>
-                  ))}
-                </select>
-              )}
+                  min="0"
+                  step="0.01"
+                />
+              </div>
+            </div>
+
+            <div className="form-row">
+              <div className="form-group">
+                <label htmlFor="descuento_aplicado">🏷️ Descuento Aplicado</label>
+                <input
+                  type="number"
+                  id="descuento_aplicado"
+                  name="descuento_aplicado"
+                  value={formData.descuento_aplicado}
+                  onChange={handleInputChange}
+                  min="0"
+                  step="0.01"
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="margen_ganancia">📈 Margen de Ganancia *</label>
+                <input
+                  type="number"
+                  id="margen_ganancia"
+                  name="margen_ganancia"
+                  value={formData.margen_ganancia}
+                  onChange={handleInputChange}
+                  required
+                  min="0"
+                  step="0.01"
+                />
+              </div>
             </div>
           </div>
 
-          <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="cantidad_vendida">
-                <span className="label-icon">📊</span>
-                Cantidad Vendida *
-              </label>
-              <input
-                type="number"
-                id="cantidad_vendida"
-                name="cantidad_vendida"
-                value={formData.cantidad_vendida}
-                onChange={handleInputChange}
-                required
-                min="1"
-              />
+          {/* Sección Participantes */}
+          <div className="form-section">
+            <h3 className="section-title">👥 Información de Participantes</h3>
+
+            <div className="form-row">
+              <div className="form-group">
+                <label htmlFor="cliente_key">👤 Cliente *</label>
+                {loadingData ? (
+                  <div className="loading-select">
+                    <div className="spinner"></div>
+                    Cargando clientes...
+                  </div>
+                ) : (
+                  <select
+                    id="cliente_key"
+                    name="cliente_key"
+                    value={formData.cliente_key}
+                    onChange={handleInputChange}
+                    required
+                  >
+                    <option value="">Selecciona un cliente</option>
+                    {clientes.map((cliente) => (
+                      <option key={cliente.cliente_key} value={cliente.cliente_key}>
+                        {cliente.nombre} {cliente.apellido}
+                      </option>
+                    ))}
+                  </select>
+                )}
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="tienda_key">🏪 Tienda *</label>
+                {loadingData ? (
+                  <div className="loading-select">
+                    <div className="spinner"></div>
+                    Cargando tiendas...
+                  </div>
+                ) : (
+                  <select
+                    id="tienda_key"
+                    name="tienda_key"
+                    value={formData.tienda_key}
+                    onChange={handleInputChange}
+                    required
+                  >
+                    <option value="">Selecciona una tienda</option>
+                    {tiendas.map((tienda) => (
+                      <option key={tienda.tienda_key} value={tienda.tienda_key}>
+                        {tienda.nombre_tienda} - {tienda.direccion}
+                      </option>
+                    ))}
+                  </select>
+                )}
+              </div>
             </div>
 
-            <div className="form-group">
-              <label htmlFor="precio_unitario">
-                <span className="label-icon">💰</span>
-                Precio Unitario *
-              </label>
-              <input
-                type="number"
-                id="precio_unitario"
-                name="precio_unitario"
-                value={formData.precio_unitario}
-                onChange={handleInputChange}
-                required
-                min="0"
-                step="0.01"
-              />
-            </div>
-          </div>
-
-          <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="descuento_aplicado">
-                <span className="label-icon">🏷️</span>
-                Descuento Aplicado
-              </label>
-              <input
-                type="number"
-                id="descuento_aplicado"
-                name="descuento_aplicado"
-                value={formData.descuento_aplicado}
-                onChange={handleInputChange}
-                min="0"
-                step="0.01"
-              />
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="margen_ganancia">
-                <span className="label-icon">📈</span>
-                Margen de Ganancia *
-              </label>
-              <input
-                type="number"
-                id="margen_ganancia"
-                name="margen_ganancia"
-                value={formData.margen_ganancia}
-                onChange={handleInputChange}
-                required
-                min="0"
-                step="0.01"
-              />
-            </div>
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="cliente_key">
-              <span className="label-icon">👤</span>
-              Cliente UUID *
-            </label>
-            <input
-              type="text"
-              id="cliente_key"
-              name="cliente_key"
-              value={formData.cliente_key}
-              onChange={handleInputChange}
-              required
-              placeholder="UUID del cliente"
-            />
-          </div>
-
-          <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="tienda_key">
-                <span className="label-icon">🏪</span>
-                Tienda UUID *
-              </label>
-              <input
-                type="text"
-                id="tienda_key"
-                name="tienda_key"
-                value={formData.tienda_key}
-                onChange={handleInputChange}
-                required
-                placeholder="UUID de la tienda"
-              />
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="vendedor_key">
-                <span className="label-icon">👨‍💼</span>
-                Vendedor UUID *
-              </label>
-              <input
-                type="text"
-                id="vendedor_key"
-                name="vendedor_key"
-                value={formData.vendedor_key}
-                onChange={handleInputChange}
-                required
-                placeholder="UUID del vendedor"
-              />
+            <div className="form-row">
+              <div className="form-group">
+                <label htmlFor="vendedor_key">👨‍💼 Vendedor *</label>
+                {loadingData ? (
+                  <div className="loading-select">
+                    <div className="spinner"></div>
+                    Cargando vendedores...
+                  </div>
+                ) : (
+                  <select
+                    id="vendedor_key"
+                    name="vendedor_key"
+                    value={formData.vendedor_key}
+                    onChange={handleInputChange}
+                    required
+                  >
+                    <option value="">Selecciona un vendedor</option>
+                    {vendedores.map((vendedor) => (
+                      <option key={vendedor.vendedor_key} value={vendedor.vendedor_key}>
+                        {vendedor.nombre} - {vendedor.activo ? "Activo" : "Inactivo"}
+                      </option>
+                    ))}
+                  </select>
+                )}
+              </div>
             </div>
           </div>
 
+          {/* Total */}
           <div className="total-section">
             <div className="total-display">
-              <span className="total-label">💵 Total de la Venta:</span>
-              <span className="total-amount">${calculateTotal().toLocaleString()}</span>
+              <span className="total-label">💰 Total de la Venta:</span>
+              <span className="total-amount">
+                ${calculateTotal().toLocaleString("es-MX", { minimumFractionDigits: 2 })}
+              </span>
             </div>
           </div>
 
+          {/* Mensajes */}
           {message && (
             <div className={`message ${message.type}`}>
               <span className="message-icon">{message.type === "success" ? "✅" : "❌"}</span>
@@ -346,30 +432,20 @@ const Ventas: React.FC = () => {
             </div>
           )}
 
-          <button type="submit" disabled={loading || loadingData} className="submit-btn">
-            {loading ? (
-              <>
-                <span className="loading-spinner"></span>
-                Registrando...
-              </>
-            ) : (
-              <>
-                <span className="btn-icon">💾</span>
-                Registrar Venta
-              </>
-            )}
-          </button>
+          {/* Botón Submit */}
+          <div className="form-actions">
+            <button type="submit" disabled={loading || loadingData} className="submit-btn">
+              {loading ? (
+                <>
+                  <div className="spinner"></div>
+                  Registrando...
+                </>
+              ) : (
+                <>💾 Registrar Venta</>
+              )}
+            </button>
+          </div>
         </form>
-
-        <div className="ventas-info">
-          <h3>💡 Información sobre Ventas</h3>
-          <ul>
-            <li>💰 Las ventas registran transacciones completas del sistema</li>
-            <li>🔗 Conecta fechas, productos, clientes, tiendas y vendedores</li>
-            <li>📊 El total se calcula automáticamente</li>
-            <li>🏷️ Los descuentos reducen el monto final</li>
-          </ul>
-        </div>
       </div>
     </div>
   )
