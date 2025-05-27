@@ -100,131 +100,100 @@ const Modelo: React.FC = () => {
   }
 
   const handleNavigateToList = () => {
-    // Para React Router, puedes usar navigate o window.location
     window.location.href = "/lista-modelos"
-    // O si usas React Router: navigate('/lista-modelos')
   }
 
   return (
-    <div className="modelo-container">
-      <div className="modelo-header">
-        <h1>🚗 Gestión de Modelos</h1>
-        <p>Administra los modelos de vehículos del sistema</p>
-      </div>
+    <div className="modelo-page">
+      <div className="modelo-container">
+        <div className="modelo-header">
+          <h1 className="modelo-title">Gestión de Modelos</h1>
+          <p className="modelo-subtitle">Administra los modelos de vehículos del sistema</p>
+        </div>
 
-      <div className="modelo-form-container">
-        {/* Botón para ir a la lista */}
-        <button onClick={handleNavigateToList} className="navigation-btn">
-          <span>📋</span>
-          Ver Lista de Modelos
-        </button>
-
-        <form onSubmit={handleSubmit} className="modelo-form">
-          <div className="form-group">
-            <label htmlFor="nombre_modelo">
-              <span className="label-icon">🏷️</span>
-              Nombre del Modelo *
-            </label>
-            <input
-              type="text"
-              id="nombre_modelo"
-              name="nombre_modelo"
-              value={formData.nombre_modelo}
-              onChange={handleInputChange}
-              required
-              placeholder="Ej: Corolla, Civic, Mustang, X5..."
-            />
-          </div>
-
-          <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="año_lanzamiento">
-                <span className="label-icon">📅</span>
-                Año de Lanzamiento *
+        <div className="modelo-form-container">
+          <form onSubmit={handleSubmit} className="modelo-form">
+            <div className="form-group full-width">
+              <label htmlFor="nombre_modelo" className="form-label">
+                Nombre del Modelo *
               </label>
               <input
-                type="number"
-                id="año_lanzamiento"
-                name="año_lanzamiento"
-                value={formData.año_lanzamiento}
+                type="text"
+                id="nombre_modelo"
+                name="nombre_modelo"
+                value={formData.nombre_modelo}
                 onChange={handleInputChange}
                 required
-                min="1900"
-                max={new Date().getFullYear() + 5}
+                placeholder="Ej: Corolla, Civic, Mustang, X5..."
+                className="form-input"
               />
             </div>
 
-            <div className="form-group">
-              <label htmlFor="marca_key">
-                <span className="label-icon">🏭</span>
-                Marca *
-              </label>
-              {loadingMarcas ? (
-                <div className="loading-select">
-                  <span className="loading-spinner"></span>
-                  Cargando marcas...
-                </div>
-              ) : (
-                <select
-                  id="marca_key"
-                  name="marca_key"
-                  value={formData.marca_key}
+            <div className="form-row">
+              <div className="form-group">
+                <label htmlFor="año_lanzamiento" className="form-label">
+                  Año de Lanzamiento *
+                </label>
+                <input
+                  type="number"
+                  id="año_lanzamiento"
+                  name="año_lanzamiento"
+                  value={formData.año_lanzamiento}
                   onChange={handleInputChange}
                   required
-                >
-                  <option value={0}>Selecciona una marca</option>
-                  {marcas.map((marca) => (
-                    <option key={marca.marca_key} value={marca.marca_key}>
-                      {marca.nombre_marca}
-                    </option>
-                  ))}
-                </select>
-              )}
+                  min="1900"
+                  max={new Date().getFullYear() + 5}
+                  className="form-input"
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="marca_key" className="form-label">
+                  Marca *
+                </label>
+                {loadingMarcas ? (
+                  <div className="form-input" style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                    <div className="loading-spinner"></div>
+                    Cargando marcas...
+                  </div>
+                ) : (
+                  <select
+                    id="marca_key"
+                    name="marca_key"
+                    value={formData.marca_key}
+                    onChange={handleInputChange}
+                    required
+                    className="form-select"
+                  >
+                    <option value={0}>Selecciona una marca</option>
+                    {marcas.map((marca) => (
+                      <option key={marca.marca_key} value={marca.marca_key}>
+                        {marca.nombre_marca}
+                      </option>
+                    ))}
+                  </select>
+                )}
+              </div>
             </div>
-          </div>
 
-          {message && (
-            <div className={`message ${message.type}`}>
-              <span className="message-icon">{message.type === "success" ? "✅" : "❌"}</span>
-              {message.text}
+            {message && <div className={`alert alert-${message.type}`}>{message.text}</div>}
+
+            <div className="form-actions">
+              <button type="button" onClick={handleNavigateToList} className="btn btn-secondary">
+                Ir al listado
+              </button>
+              <button type="submit" disabled={loading || loadingMarcas} className="btn btn-primary">
+                {loading ? (
+                  <>
+                    <div className="loading-spinner"></div>
+                    Creando...
+                  </>
+                ) : (
+                  "Crear"
+                )}
+              </button>
             </div>
-          )}
-
-          <button type="submit" disabled={loading || loadingMarcas} className="submit-btn">
-            {loading ? (
-              <>
-                <span className="loading-spinner"></span>
-                Creando...
-              </>
-            ) : (
-              <>
-                <span className="btn-icon">💾</span>
-                Crear Modelo
-              </>
-            )}
-          </button>
-        </form>
-
-        <div className="modelo-info">
-          <h3>💡 Información sobre Modelos</h3>
-          <ul>
-            <li>
-              <span>🚗</span>
-              Los modelos pertenecen a una marca específica
-            </li>
-            <li>
-              <span>📅</span>
-              El año de lanzamiento indica cuándo se introdujo el modelo
-            </li>
-            <li>
-              <span>🔗</span>
-              Cada modelo se relaciona con productos específicos
-            </li>
-            <li>
-              <span>✨</span>
-              Ejemplos: Corolla (Toyota), Civic (Honda), Mustang (Ford)
-            </li>
-          </ul>
+          </form>
         </div>
       </div>
     </div>
