@@ -1,5 +1,5 @@
 import PowerBIGrafico from "../../components/tiendaBi/Tiendas"
-import "../../components/css/TiendasBI.css"
+import "../../components/css/tiendasbi.css"
 
 function Tiendas() {
   return (
